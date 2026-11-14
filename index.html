@@ -34,37 +34,50 @@
     
     /* GŁÓWNY NAGŁÓWEK APLIKACJI */
     header {
-      height: 60px;
+      height: 56px;
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 14px;
       z-index: 1000;
       box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       flex-shrink: 0;
+      gap: 8px;
     }
     
+    .title-area {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
     .title-area h1 {
-      font-size: 1.08rem;
+      font-size: 1.02rem;
       margin: 0;
       color: #38bdf8;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .title-area p {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       margin: 2px 0 0 0;
       color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .badges {
@@ -87,26 +100,29 @@
     .btn-head {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       background: #1e293b;
       color: #f1f5f9;
       border: 1px solid #334155;
-      padding: 6px 11px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 0.74rem;
+      font-size: 0.73rem;
       font-weight: 600;
       cursor: pointer;
+      white-space: nowrap;
       transition: background 0.15s, transform 0.05s;
     }
     .btn-head:hover { background: #334155; }
     .btn-head:active { transform: scale(0.97); }
+    .btn-head.btn-layers { background: rgba(56, 189, 248, 0.15); border-color: #38bdf8; color: #38bdf8; }
+    .btn-head.btn-layers:hover { background: rgba(56, 189, 248, 0.25); }
     .btn-head.btn-pwa { background: #0284c7; color: white; border-color: #38bdf8; }
     .btn-head.btn-mobile-only { display: none; }
 
     /* KONTENER GŁÓWNY: MAPA + BOCZNY PANEL */
     #main-container {
       display: flex;
-      height: calc(100vh - 60px);
+      height: calc(100vh - 56px);
       width: 100vw;
       position: relative;
       overflow: hidden;
@@ -128,33 +144,34 @@
     /* PŁYWAJĄCY PASEK WYBORU TRYBÓW NA MAPIE (FLOATING MODE TOOLBAR) */
     .map-mode-toolbar {
       position: absolute;
-      top: 14px;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 1000;
-      background: rgba(15, 23, 42, 0.92);
+      z-index: 990;
+      background: rgba(15, 23, 42, 0.94);
       border: 1px solid #38bdf8;
       border-radius: 30px;
-      padding: 4px 6px;
+      padding: 3px 6px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.65);
       backdrop-filter: blur(10px);
+      max-width: 95vw;
     }
     
     .mode-btn {
       background: transparent;
       border: none;
       color: #94a3b8;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 600;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 20px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.18s ease;
       white-space: nowrap;
     }
@@ -188,14 +205,14 @@
       background: rgba(220, 38, 38, 0.95);
       color: white;
       border: 1px solid #f87171;
-      padding: 8px 16px;
+      padding: 7px 15px;
       border-radius: 30px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
       display: none;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.6);
       backdrop-filter: blur(8px);
       transition: transform 0.15s, background 0.15s;
@@ -208,20 +225,20 @@
     /* INFORMACJA O TRYBIE DODAWANIA NA MAPIE */
     #mode-hint-banner {
       position: absolute;
-      top: 66px;
+      top: 60px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 999;
+      z-index: 980;
       background: rgba(16, 185, 129, 0.95);
       color: white;
       border: 1px solid #34d399;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 20px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 600;
       display: none;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       backdrop-filter: blur(8px);
       pointer-events: none;
@@ -263,14 +280,28 @@
     }
     .btn-close-mobile {
       display: none;
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.2rem;
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
       cursor: pointer;
-      padding: 4px;
     }
     
+    #sidebar-backdrop {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(3px);
+      z-index: 490;
+    }
+    #sidebar-backdrop.active {
+      display: block;
+    }
+
     /* KARTY W SIDEBARZE */
     .card {
       background: #1e293b;
@@ -456,23 +487,53 @@
       color: white;
     }
 
-    /* STYLIZACJA KONTROLKI WARSTW (LEWY GÓRNY RÓG MAPY) */
+    /* STYLIZACJA KONTROLKI WARSTW (DOMYŚLNIE ZWINIĘTA, Z PRZYCISKIEM ZAMKNIJ) */
     .leaflet-control-layers {
-      background: rgba(15, 23, 42, 0.92) !important;
+      background: rgba(15, 23, 42, 0.96) !important;
       color: #f1f5f9 !important;
-      border: 1px solid #334155 !important;
+      border: 1.5px solid #38bdf8 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.7) !important;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+      margin-top: 12px !important;
+      margin-left: 12px !important;
+    }
+    .leaflet-control-layers-toggle {
+      background-image: none !important;
+      width: 40px !important;
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
       border-radius: 10px !important;
-      padding: 10px 14px !important;
+      font-size: 1.25rem !important;
+      line-height: 1 !important;
+      cursor: pointer !important;
+    }
+    .leaflet-control-layers-toggle::after {
+      content: "🗺️";
+      display: block;
+    }
+    .leaflet-control-layers-expanded {
+      padding: 12px 14px !important;
       font-size: 0.78rem !important;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
-      backdrop-filter: blur(8px);
+      max-height: 72vh !important;
+      overflow-y: auto !important;
+      max-width: 290px !important;
+      width: 275px !important;
+    }
+    .leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+      display: none !important;
     }
     .leaflet-control-layers-base label,
     .leaflet-control-layers-overlays label {
-      margin: 4px 0 !important;
+      margin: 5px 0 !important;
       display: flex !important;
       align-items: center !important;
       cursor: pointer !important;
+      padding: 2px 0 !important;
     }
     .leaflet-control-layers-separator {
       border-top: 1px solid #334155 !important;
@@ -481,15 +542,31 @@
     .leaflet-control-layers input {
       margin-right: 8px !important;
       accent-color: #38bdf8 !important;
+      transform: scale(1.1);
+      cursor: pointer;
     }
-    .leaflet-control-zoom {
+
+    /* ZOOM CONTROLS W PRAWYM DOLNYM ROGU */
+    .leaflet-bottom.leaflet-right .leaflet-control-zoom {
+      margin-bottom: 22px !important;
+      margin-right: 14px !important;
       border: none !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
     }
     .leaflet-control-zoom a {
       background: #0f172a !important;
       color: #f8fafc !important;
-      border-bottom: 1px solid #1e293b !important;
+      border: 1px solid #334155 !important;
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 34px !important;
+      font-size: 18px !important;
+      border-radius: 8px !important;
+      margin-bottom: 4px !important;
+    }
+    .leaflet-control-zoom a:hover {
+      background: #1e293b !important;
+      color: #38bdf8 !important;
     }
 
     /* PERSONAL GIS / BAZA MIEJSC W SIDEBARZE */
@@ -620,11 +697,13 @@
     /* RESPONSYWNOŚĆ DLA URZĄDZEŃ MOBILNYCH (BEZ DOLNEGO DRAWERA!) */
     @media (max-width: 768px) {
       header {
-        height: 54px;
-        padding: 0 12px;
+        height: 52px;
+        padding: 0 10px;
+        gap: 6px;
       }
       .title-area h1 {
-        font-size: 0.93rem;
+        font-size: 0.84rem;
+        max-width: 135px;
       }
       .title-area p {
         display: none;
@@ -632,44 +711,57 @@
       .badges {
         display: none;
       }
+      .btn-head {
+        padding: 5px 8px;
+        font-size: 0.70rem;
+        gap: 3px;
+      }
       .btn-head.btn-mobile-only {
         display: inline-flex;
         background: #0284c7;
         color: white;
       }
       #main-container {
-        height: calc(100vh - 54px);
+        height: calc(100vh - 52px);
       }
       .map-mode-toolbar {
         top: 8px;
-        padding: 3px 4px;
-        max-width: 96vw;
+        padding: 2px 4px;
+        max-width: 95vw;
+        gap: 2px;
       }
       .mode-btn {
-        font-size: 0.70rem;
-        padding: 5px 8px;
+        font-size: 0.69rem;
+        padding: 5px 7px;
+        gap: 2px;
+      }
+      .hide-mobile {
+        display: none !important;
       }
       /* Na telefonie sidebar jest pełnoekranowym lub wysuwanym z boku panelem na żądanie */
       #sidebar {
         position: absolute;
         top: 0;
         right: 0;
-        width: 100%;
-        max-width: 400px;
+        width: 88%;
+        max-width: 380px;
         height: 100%;
         transform: translateX(100%);
         transition: transform 0.25s ease-in-out;
         box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        z-index: 550;
       }
       #sidebar.mobile-open {
         transform: translateX(0);
       }
       .btn-close-mobile {
-        display: block;
+        display: inline-flex;
       }
-      .leaflet-control-layers {
-        max-width: 250px;
+      .leaflet-control-layers-expanded {
+        max-width: 260px !important;
+        width: 250px !important;
         font-size: 0.72rem !important;
+        max-height: 65vh !important;
       }
     }
 
@@ -681,7 +773,7 @@
   <!-- 1. GŁÓWNY NAGŁÓWEK -->
   <header>
     <div class="title-area">
-      <h1><span>🚄</span> Rzeczywista Mapa Kolejowa Małopolski & Smart Plot Scout</h1>
+      <h1><span>🚄</span> Rail & Life Scout</h1>
       <p>Korytarz Podłęże–Piekiełko (LK 104 / LK 622) vs Łososina Dolna | Weryfikator Działek & Geodezja</p>
     </div>
     
@@ -691,6 +783,7 @@
         <span class="badge badge-amber">Tunel T13: 3,86 km Przebity</span>
         <span class="badge badge-purple">Nowa LK 622: 160–200 km/h</span>
       </div>
+      <button id="btn-toggle-layers-head" class="btn-head btn-layers" title="Pokaż / Schowaj warstwy mapy">🗺️ Warstwy</button>
       <button id="btn-gps" class="btn-head" title="Moja Pozycja GPS w terenie">🎯 GPS</button>
       <button id="btn-install-pwa" class="btn-head btn-pwa hidden" title="Zainstaluj jako aplikację">📲 Zainstaluj</button>
       <button id="btn-toggle-sidebar" class="btn-head btn-mobile-only" title="Otwórz / Zamknij Panel Działki">📋 Panel Działki</button>
@@ -706,13 +799,13 @@
       <!-- PŁYWAJĄCY PASEK WYBORU TRYBÓW INTERAKCJI -->
       <div class="map-mode-toolbar">
         <button id="btn-mode-neutral" class="mode-btn active" onclick="setInteractionMode('neutral')">
-          <span>🖐️</span> Przeglądaj
+          <span>🖐️</span> <span>Przeglądaj</span>
         </button>
         <button id="btn-mode-scout" class="mode-btn mode-scout-btn" onclick="setInteractionMode('scout')">
-          <span>🔍</span> Skanuj Działkę
+          <span>🔍</span> <span>Skanuj <span class="hide-mobile">Działkę</span></span>
         </button>
         <button id="btn-mode-add" class="mode-btn mode-add-btn" onclick="setInteractionMode('add')">
-          <span>➕</span> Dodaj Punkt na Mapie
+          <span>➕</span> <span>Dodaj <span class="hide-mobile">Punkt na Mapie</span></span>
         </button>
       </div>
 
@@ -725,13 +818,16 @@
       <button id="floating-clear-scout" onclick="clearScoutAnalysis()">
         <span>✕</span> Wyczyść linie pomiaru
       </button>
+
+      <!-- TŁO DO ZAMYKANIA SIDEBARU NA TELEFONIE -->
+      <div id="sidebar-backdrop" onclick="toggleSidebarMobile(false)"></div>
     </div>
     
     <!-- BOCZNY PANEL INFORMACYJNO-DECYZYJNY -->
     <div id="sidebar">
       <div class="sidebar-header">
         <h2>🎯 Centrum Decyzyjne Działki</h2>
-        <button id="btn-close-sidebar-mobile" class="btn-close-mobile" title="Zamknij panel">✕</button>
+        <button id="btn-close-sidebar-mobile" class="btn-close-mobile" onclick="toggleSidebarMobile(false)" title="Zamknij panel">✕ Zamknij</button>
       </div>
       
       <!-- KARTA 1: SKOCZ DO KLUCZOWYCH REJONÓW -->
@@ -949,12 +1045,14 @@
       attribution: 'Map &copy; OpenTopoMap contributors'
     });
 
-    // 3. INICJALIZACJA MAPY
+    // 3. INICJALIZACJA MAPY (ZOOM W PRAWYM DOLNYM ROGU, ABY NIE KOLIDOWAĆ Z TOOLBAREM)
     const map = L.map('map', {
       center: [49.7150, 20.6250],
       zoom: 12,
+      zoomControl: false,
       layers: [esriStreet]
     });
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     // 4. WARSTWY NAKŁADKOWE (OVERLAYS)
     const layerLK104Active = L.layerGroup().addTo(map);
@@ -995,7 +1093,7 @@
       }
     }
 
-    // 6. KONTROLKA WARSTW W LEWYM GÓRNYM ROGU (NATYWNY LEAFLET – ZAWSZE DZIAŁA)
+    // 6. KONTROLKA WARSTW (DOMYŚLNIE ZWINIĘTA DO IKONY 🗺️, ROZWIJANA Z NAGŁÓWKIEM I PRZYCISKIEM ✕ SCHOWAJ)
     const baseMaps = {
       "🗺️ Mapa Drogowa (Esri Street)": esriStreet,
       "🛰️ Satelitarna Ortofotomapa (Esri)": esriSatellite,
@@ -1010,7 +1108,59 @@
       "⭐ Złoty Pas Działkowy (Chomranice – Zawadka)": layerSpecialZones,
       "📍 Moja Baza Miejsc & Znajomych": layerUserPoints
     };
-    L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topleft' }).addTo(map);
+    
+    // ZAWSZE domyślnie zwinięta kontrolka warstw
+    const layersControl = L.control.layers(baseMaps, overlayMaps, {
+      collapsed: true,
+      position: 'topleft'
+    }).addTo(map);
+
+    // Dodanie nagłówka i przycisku '✕ Schowaj' wewnątrz rozwiniętej kontrolki warstw
+    const layersContainer = layersControl.getContainer();
+    const layersList = layersContainer ? layersContainer.querySelector('.leaflet-control-layers-list') : null;
+    if (layersList) {
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'layers-box-header';
+      headerDiv.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:6px;">
+          <span style="font-weight:700; color:#38bdf8; font-size:0.80rem; display:flex; align-items:center; gap:5px;">
+            <span>🗺️</span> Warstwy Mapy
+          </span>
+          <button type="button" id="btn-close-layers-box" style="background:#334155; color:#f8fafc; border:1px solid #475569; border-radius:6px; padding:3px 9px; font-size:0.72rem; cursor:pointer; font-weight:700;">✕ Schowaj</button>
+        </div>
+      `;
+      layersList.insertBefore(headerDiv, layersList.firstChild);
+      
+      const btnCloseBox = headerDiv.querySelector('#btn-close-layers-box');
+      if (btnCloseBox) {
+        btnCloseBox.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          layersControl.collapse();
+        });
+      }
+    }
+
+    // Przycisk "🗺️ Warstwy" w nagłówku strony
+    const btnToggleLayersHead = document.getElementById('btn-toggle-layers-head');
+    if (btnToggleLayersHead && layersContainer) {
+      btnToggleLayersHead.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (layersContainer.classList.contains('leaflet-control-layers-expanded')) {
+          layersControl.collapse();
+        } else {
+          layersControl.expand();
+        }
+      });
+    }
+
+    // Kliknięcie w mapę natychmiast zwija warstwy, jeśli były otwarte
+    map.on('click', () => {
+      if (layersContainer && layersContainer.classList.contains('leaflet-control-layers-expanded')) {
+        layersControl.collapse();
+      }
+    });
 
     // 7. PRECYZYJNE ZNACZNIKI RODZINNE I INFRASTRUKTURY
     function createIconDiv(emoji, bgColor, borderColor) {
@@ -1348,7 +1498,7 @@
 
       // Otwórz sidebar na telefonie, by użytkownik widział wynik
       if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.add('mobile-open');
+        toggleSidebarMobile(true);
       }
     }
 
@@ -1518,7 +1668,7 @@
       });
 
       if (filtered.length === 0) {
-        listContainer.innerHTML = '<div style="color:#64748b; font-size:0.75rem; text-align:center; padding:10px;">Brak punktów w tej kategorii. Kliknij <strong>➕ Dodaj Punkt na Mapie</strong> powyżej!</div>';
+        listContainer.innerHTML = '<div style="color:#64748b; font-size:0.75rem; text-align:center; padding:10px;">Brak punktów w tej kategorii. Kliknij <strong>➕ Dodaj Punkt</strong> powyżej!</div>';
       }
     }
 
@@ -1535,7 +1685,7 @@
       map.flyTo([p.lat, p.lng], 16, { duration: 1.2 });
       if (markersMap[id]) markersMap[id].openPopup();
       if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('mobile-open');
+        toggleSidebarMobile(false);
       }
     }
 
@@ -1734,20 +1884,23 @@
       );
     });
 
-    // 13. PRZEŁĄCZNIK BOCZNEGO PANELU NA TELEFONIE (BEZ DOLNEGO DRAWERA!)
+    // 13. PRZEŁĄCZNIK BOCZNEGO PANELU NA TELEFONIE (Z TŁEM BACKDROP)
     const sidebarEl = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
     const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
-    const closeSidebarMobileBtn = document.getElementById('btn-close-sidebar-mobile');
+
+    function toggleSidebarMobile(open) {
+      if (typeof open === 'boolean') {
+        sidebarEl.classList.toggle('mobile-open', open);
+        if (sidebarBackdrop) sidebarBackdrop.classList.toggle('active', open);
+      } else {
+        const isOpen = sidebarEl.classList.toggle('mobile-open');
+        if (sidebarBackdrop) sidebarBackdrop.classList.toggle('active', isOpen);
+      }
+    }
 
     if (toggleSidebarBtn) {
-      toggleSidebarBtn.addEventListener('click', () => {
-        sidebarEl.classList.toggle('mobile-open');
-      });
-    }
-    if (closeSidebarMobileBtn) {
-      closeSidebarMobileBtn.addEventListener('click', () => {
-        sidebarEl.classList.remove('mobile-open');
-      });
+      toggleSidebarBtn.addEventListener('click', () => toggleSidebarMobile());
     }
 
     
