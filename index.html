@@ -34,29 +34,29 @@
     
     /* GŁÓWNY NAGŁÓWEK APLIKACJI */
     header {
-      height: 64px;
+      height: 60px;
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 18px;
+      padding: 0 16px;
       z-index: 1000;
       box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       flex-shrink: 0;
     }
     
     .title-area h1 {
-      font-size: 1.12rem;
+      font-size: 1.08rem;
       margin: 0;
       color: #38bdf8;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .title-area p {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       margin: 2px 0 0 0;
       color: #94a3b8;
     }
@@ -64,20 +64,20 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .badges {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
     .badge {
-      font-size: 0.70rem;
+      font-size: 0.68rem;
       font-weight: 600;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 9999px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       white-space: nowrap;
     }
     .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
@@ -91,9 +91,9 @@
       background: #1e293b;
       color: #f1f5f9;
       border: 1px solid #334155;
-      padding: 6px 12px;
+      padding: 6px 11px;
       border-radius: 8px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.15s, transform 0.05s;
@@ -106,20 +106,128 @@
     /* KONTENER GŁÓWNY: MAPA + BOCZNY PANEL */
     #main-container {
       display: flex;
-      height: calc(100vh - 64px);
+      height: calc(100vh - 60px);
       width: 100vw;
       position: relative;
       overflow: hidden;
     }
     
-    #map {
+    #map-wrapper {
       flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
       height: 100%;
       background: #1e293b;
       z-index: 1;
     }
+
+    /* PŁYWAJĄCY PASEK WYBORU TRYBÓW NA MAPIE (FLOATING MODE TOOLBAR) */
+    .map-mode-toolbar {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #38bdf8;
+      border-radius: 30px;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.65);
+      backdrop-filter: blur(10px);
+    }
     
-    /* KLASYCZNY, CZYTELNY SIDEBAR (430px) */
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .mode-btn:hover {
+      color: #f8fafc;
+      background: rgba(51, 65, 85, 0.6);
+    }
+    .mode-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+    .mode-btn.mode-add-btn.active {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+    .mode-btn.mode-scout-btn.active {
+      background: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+    }
+
+    /* PŁYWAJĄCY PRZYCISK CZYSZCZENIA POMIARU NA MAPIE */
+    #floating-clear-scout {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(220, 38, 38, 0.95);
+      color: white;
+      border: 1px solid #f87171;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      transition: transform 0.15s, background 0.15s;
+    }
+    #floating-clear-scout:hover {
+      background: #b91c1c;
+      transform: translateX(-50%) scale(1.03);
+    }
+
+    /* INFORMACJA O TRYBIE DODAWANIA NA MAPIE */
+    #mode-hint-banner {
+      position: absolute;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      background: rgba(16, 185, 129, 0.95);
+      color: white;
+      border: 1px solid #34d399;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+    
+    /* KLASYCZNY, CZYTELNY SIDEBAR (440px) */
     #sidebar {
       width: 440px;
       height: 100%;
@@ -196,7 +304,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
       background: #0284c7;
       color: white;
       border: none;
@@ -216,6 +324,8 @@
     .btn-emerald:hover { background: #047857; }
     .btn-purple { background: #7c3aed; }
     .btn-purple:hover { background: #6d28d9; }
+    .btn-red { background: #dc2626; }
+    .btn-red:hover { background: #b91c1c; }
     .btn-slate { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
     .btn-slate:hover { background: #475569; color: white; }
 
@@ -268,6 +378,14 @@
     .custom-popup p { margin: 4px 0; font-size: 0.8rem; color: #cbd5e1; }
     .custom-popup ul { margin: 4px 0 0 16px; padding: 0; font-size: 0.78rem; }
     
+    /* MODAL POPUP MULTIMODAL ROUTING */
+    .route-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
     /* ANALIZATOR DZIAŁKI */
     #plot-analysis-box {
       background: rgba(15, 23, 42, 0.95);
@@ -295,6 +413,48 @@
     .rating-ideal { background: #065f46; color: #34d399; }
     .rating-good { background: #1e3a8a; color: #60a5fa; }
     .rating-noisy { background: #7c2d12; color: #f87171; }
+
+    /* MULTIMODAL ROUTING CARDS */
+    .routing-options-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px;
+      margin-top: 8px;
+    }
+    .routing-options-title {
+      font-weight: 700;
+      font-size: 0.76rem;
+      color: #38bdf8;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .route-modes-row {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .btn-route-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.71rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-route-link:hover {
+      background: #334155;
+      border-color: #38bdf8;
+      color: white;
+    }
 
     /* STYLIZACJA KONTROLKI WARSTW (LEWY GÓRNY RÓG MAPY) */
     .leaflet-control-layers {
@@ -356,7 +516,7 @@
       font-weight: 700;
     }
     .points-list {
-      max-height: 240px;
+      max-height: 250px;
       overflow-y: auto;
       margin-top: 8px;
       display: flex;
@@ -378,7 +538,7 @@
       border-color: #38bdf8;
     }
     .point-info {
-      max-width: 280px;
+      max-width: 250px;
     }
     .point-name {
       font-weight: 700;
@@ -464,7 +624,7 @@
         padding: 0 12px;
       }
       .title-area h1 {
-        font-size: 0.95rem;
+        font-size: 0.93rem;
       }
       .title-area p {
         display: none;
@@ -479,6 +639,15 @@
       }
       #main-container {
         height: calc(100vh - 54px);
+      }
+      .map-mode-toolbar {
+        top: 8px;
+        padding: 3px 4px;
+        max-width: 96vw;
+      }
+      .mode-btn {
+        font-size: 0.70rem;
+        padding: 5px 8px;
       }
       /* Na telefonie sidebar jest pełnoekranowym lub wysuwanym z boku panelem na żądanie */
       #sidebar {
@@ -530,8 +699,33 @@
 
   <!-- 2. KONTENER GŁÓWNY -->
   <div id="main-container">
-    <!-- MAPA -->
-    <div id="map"></div>
+    <!-- MAPA Z PŁYWAJĄCYMI KONTROLKAMI -->
+    <div id="map-wrapper">
+      <div id="map"></div>
+      
+      <!-- PŁYWAJĄCY PASEK WYBORU TRYBÓW INTERAKCJI -->
+      <div class="map-mode-toolbar">
+        <button id="btn-mode-neutral" class="mode-btn active" onclick="setInteractionMode('neutral')">
+          <span>🖐️</span> Przeglądaj
+        </button>
+        <button id="btn-mode-scout" class="mode-btn mode-scout-btn" onclick="setInteractionMode('scout')">
+          <span>🔍</span> Skanuj Działkę
+        </button>
+        <button id="btn-mode-add" class="mode-btn mode-add-btn" onclick="setInteractionMode('add')">
+          <span>➕</span> Dodaj Punkt na Mapie
+        </button>
+      </div>
+
+      <!-- BANER POMOCNICZY W TRYBIE DODAWANIA -->
+      <div id="mode-hint-banner">
+        <span>📍 Kliknij w dowolne miejsce na mapie, aby natychmiast postawić punkt</span>
+      </div>
+
+      <!-- PŁYWAJĄCY PRZYCISK CZYSZCZENIA POMIARU / LINII -->
+      <button id="floating-clear-scout" onclick="clearScoutAnalysis()">
+        <span>✕</span> Wyczyść linie pomiaru
+      </button>
+    </div>
     
     <!-- BOCZNY PANEL INFORMACYJNO-DECYZYJNY -->
     <div id="sidebar">
@@ -555,13 +749,14 @@
         </div>
       </div>
 
-      <!-- KARTA 2: INTELIGENTNY SKANER DZIAŁKI (KLIK W MAPĘ) -->
-      <div class="card" style="border-left: 4px solid #38bdf8;">
+      <!-- KARTA 2: INTELIGENTNY SKANER DZIAŁKI -->
+      <div class="card" style="border-left: 4px solid #f59e0b;">
         <div class="card-title">
-          <span>🔍 Inteligentny Skaner Działki (Kliknij na mapie)</span>
+          <span>🔍 Skaner Działki & Multimodalne Trasy</span>
+          <button id="btn-clear-scout-sidebar" class="btn-action btn-red hidden" style="padding: 2px 7px; font-size: 0.68rem;" onclick="clearScoutAnalysis()">✕ Wyczyść linie</button>
         </div>
-        <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 6px 0;">
-          Kliknij w <strong>dowolne miejsce na mapie</strong> (np. oglądaną parcelę), aby wyliczyć dojazd lokalnymi drogami, sprawdzić strefę akustyczną i otworzyć ją w Geoportalu Krajowym!
+        <p style="font-size:0.77rem; color:#94a3b8; margin:0 0 6px 0;">
+          Wybierz u góry tryb <strong>🔍 Skanuj Działkę</strong> i kliknij dowolne miejsce na mapie, aby zbadać czasy dojazdu (auto, pieszo, komunikacja), strefę akustyczną i Geoportal.
         </p>
         <div id="plot-analysis-box"></div>
       </div>
@@ -569,16 +764,17 @@
       <!-- KARTA 3: TWOJA OSOBISTA BAZA MIEJSC (PERSONAL GIS & LIFE HUB) -->
       <div class="card" style="border-left: 4px solid #10b981;">
         <div class="card-title">
-          <span>📍 Twoja Baza Miejsc & Działek</span>
-          <button class="btn-action btn-emerald" style="padding: 3px 8px; font-size: 0.72rem;" onclick="openAddPointModal()">+ Dodaj Punkt</button>
+          <span>📍 Osobista Baza Miejsc & Znajomych</span>
+          <button class="btn-action btn-emerald" style="padding: 3px 8px; font-size: 0.72rem;" onclick="setInteractionMode('add')">➕ Kliknij na mapie</button>
         </div>
         
         <!-- Filtry kategorii -->
         <div class="gis-filter-bar">
           <button class="gis-pill active" onclick="filterCategory('all', this)">Wszystkie</button>
-          <button class="gis-pill" onclick="filterCategory('plot', this)">🏡 Działki</button>
           <button class="gis-pill" onclick="filterCategory('family', this)">👨‍👩‍👧 Rodzina</button>
           <button class="gis-pill" onclick="filterCategory('friends', this)">🤝 Znajomi</button>
+          <button class="gis-pill" onclick="filterCategory('plot', this)">🏡 Działki</button>
+          <button class="gis-pill" onclick="filterCategory('pros', this)">🚜 Fachowcy</button>
           <button class="gis-pill" onclick="filterCategory('bess', this)">⚡ BESS / OZE</button>
           <button class="gis-pill" onclick="filterCategory('note', this)">📌 Notatki</button>
         </div>
@@ -660,12 +856,14 @@
       <!-- KARTA 7: PORTALE PAŃSTWOWE -->
       <div class="card">
         <div class="card-title">
-          <span>🌐 Oficjalne Geoportale (Sprawdź Działkę)</span>
+          <span>🌐 Oficjalne Geoportale & Rozkłady</span>
         </div>
         <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 0.79rem;">
           <li><a href="https://mapy.geoportal.gov.pl/" target="_blank" style="color:#38bdf8; font-weight:600;">Geoportal.gov.pl (Działki katastralne EGIB i LIDAR NMT)</a></li>
           <li><a href="https://osuwiska.pgi.gov.pl/" target="_blank" style="color:#38bdf8; font-weight:600;">Rejestr Osuwisk SOPO (Państwowy Instytut Geologiczny)</a></li>
-          <li><a href="https://mapa.plk-sa.pl/" target="_blank" style="color:#38bdf8;">MILK – Mapa Interaktywna Linii PKP PLK</a></li>
+          <li><a href="https://www.e-podroznik.pl/" target="_blank" style="color:#38bdf8; font-weight:600;">e-podróżnik.pl (Rozkłady autobusów i busów lokalnych)</a></li>
+          <li><a href="https://portalpasazera.pl/" target="_blank" style="color:#38bdf8;">Portal Pasażera PKP PLK (Oficjalny rozkład pociągów)</a></li>
+          <li><a href="https://kolejemalopolskie.com.pl/" target="_blank" style="color:#38bdf8;">Koleje Małopolskie (Autobusowe Linie Dowozowe ALD)</a></li>
           <li><a href="https://podleze-piekielko.pl/mapy-i-multimedia/mapy/" target="_blank" style="color:#38bdf8;">Oficjalne plany Podłęże–Piekiełko</a></li>
         </ul>
       </div>
@@ -677,42 +875,43 @@
   <div id="point-modal">
     <div class="modal-content">
       <h3 id="modal-point-title">
-        <span>📍 Dodaj Punkt / Działkę</span>
+        <span>📍 Dodaj Punkt</span>
         <button onclick="closePointModal()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>
       </h3>
       <form id="point-form" onsubmit="savePointForm(event)">
         <input type="hidden" id="modal-point-id" />
         <div class="form-group">
-          <label>Nazwa Punktu:</label>
-          <input type="text" id="modal-point-name" required placeholder="np. Działka Zawadka z widokiem na Tatry, Dom Tomka..." />
+          <label>Nazwa Punktu / Kto tu mieszka:</label>
+          <input type="text" id="modal-point-name" required placeholder="np. Dom wujka Mariusza, Działka z widokiem na Tatry, Znajomy z Sącza..." />
         </div>
         <div class="form-group">
           <label>Kategoria:</label>
           <select id="modal-point-category">
-            <option value="plot">🏡 Działka / Budowa Domu</option>
-            <option value="family">👨‍👩‍👧 Rodzina / Bliscy</option>
+            <option value="family">👨‍👩‍👧 Rodzina (Wujek, Ciocia, Kuzyni...)</option>
             <option value="friends">🤝 Znajomi / Przyjaciele</option>
+            <option value="plot">🏡 Działka / Budowa Domu</option>
+            <option value="pros">🚜 Fachowcy / Sprzęt / Usługi</option>
             <option value="neighbors">🏘️ Sąsiedzi</option>
             <option value="bess">⚡ BESS / Magazyn Energii / AGH</option>
-            <option value="note">📌 Notatka / Pomysł</option>
+            <option value="note">📌 Notatka / Inne</option>
           </select>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
           <div class="form-group">
             <label>Szerokość (Lat):</label>
-            <input type="number" step="0.000001" id="modal-point-lat" required />
+            <input type="number" step="0.000001" id="modal-point-lat" required readonly style="background:#0f172a; color:#94a3b8;" />
           </div>
           <div class="form-group">
             <label>Długość (Lng):</label>
-            <input type="number" step="0.000001" id="modal-point-lng" required />
+            <input type="number" step="0.000001" id="modal-point-lng" required readonly style="background:#0f172a; color:#94a3b8;" />
           </div>
         </div>
         <div class="form-group">
-          <label>Opis i Notatki (cena, właściciel, dojazd, spostrzeżenia):</label>
-          <textarea id="modal-point-desc" rows="3" placeholder="Wpisz wszelkie szczegóły..."></textarea>
+          <label>Opis i Notatki (telefon, dojazd, czym dysponuje, cena działki):</label>
+          <textarea id="modal-point-desc" rows="3" placeholder="Wpisz wszelkie przydatne informacje (np. telefon, ma traktor, stroma droga, ładna działka)..."></textarea>
         </div>
         <div class="modal-actions">
-          <button type="button" id="btn-delete-point" class="btn-action" style="background:#dc2626; margin-right:auto;" onclick="deleteCurrentPoint()">Usuń</button>
+          <button type="button" id="btn-delete-point" class="btn-action btn-red" style="margin-right:auto;" onclick="deleteCurrentPoint()">🗑️ Usuń punkt</button>
           <button type="button" class="btn-action btn-slate" onclick="closePointModal()">Anuluj</button>
           <button type="submit" class="btn-action btn-emerald">Zapisz Punkt</button>
         </div>
@@ -809,7 +1008,7 @@
       "🟣 Nowa Linia LK 622 (Podłęże – Tymbark)": layerLK622,
       "⚪ Główne Linie (Kraków – Tarnów – Sącz)": layerMainlines,
       "⭐ Złoty Pas Działkowy (Chomranice – Zawadka)": layerSpecialZones,
-      "📍 Moja Baza Miejsc & Działek": layerUserPoints
+      "📍 Moja Baza Miejsc & Znajomych": layerUserPoints
     };
     L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topleft' }).addTo(map);
 
@@ -823,6 +1022,36 @@
       });
     }
 
+    // Generowanie linków Google Maps i e-podróżnik dla punktu
+    function getRoutingLinksHtml(destLat, destLng, destName) {
+      const originLat = homeEmilCoords[0];
+      const originLng = homeEmilCoords[1];
+      const gmapsCar = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}&travelmode=driving`;
+      const gmapsWalk = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}&travelmode=walking`;
+      const gmapsBike = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}&travelmode=bicycling`;
+      const gmapsTransit = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}&travelmode=transit`;
+      const epodroznik = `https://www.e-podroznik.pl/public/searchingResultsTransportation.do?startCity=%C5%81ososina+Dolna&endCity=Nowy+S%C4%85cz`;
+      const geoportal = `https://mapy.geoportal.gov.pl/imap/Imgp_2.html?locale=pl&gui=new&session=&zoom=17&xy=${destLng},${destLat}`;
+
+      return `
+        <div class="routing-options-card">
+          <div class="routing-options-title">
+            <span>🧭 Trasa i Dojazd (z Domu 375):</span>
+          </div>
+          <div class="route-modes-row">
+            <a href="${gmapsCar}" target="_blank" class="btn-route-link" title="Nawiguj samochodem">🚗 Samochód</a>
+            <a href="${gmapsWalk}" target="_blank" class="btn-route-link" title="Trasa piesza">🚶 Pieszo</a>
+            <a href="${gmapsBike}" target="_blank" class="btn-route-link" title="Trasa rowerowa">🚲 Rower</a>
+            <a href="${gmapsTransit}" target="_blank" class="btn-route-link" title="Komunikacja publiczna">🚌 Transport</a>
+          </div>
+          <div style="margin-top:5px; display:flex; gap:5px;">
+            <a href="${epodroznik}" target="_blank" class="btn-route-link" style="color:#38bdf8;">🎫 e-podróżnik</a>
+            <a href="${geoportal}" target="_blank" class="btn-route-link" style="color:#34d399;">🗺️ Geoportal</a>
+          </div>
+        </div>
+      `;
+    }
+
     // Dom Rodzinny Emila (Łososina 375)
     const homeMarker = L.marker(homeEmilCoords, { icon: createIconDiv('🏡', '#ef4444', '#fca5a5') }).addTo(map).bindPopup(`
       <div class="custom-popup">
@@ -830,6 +1059,9 @@
         <p><strong>Współrzędne:</strong> 49.75890° N, 20.63283° E</p>
         <p><strong>Lokalizacja:</strong> Równia – widokowy grzbiet, ojcowizna.</p>
         <p><strong>Dojazd do stacji Chomranice:</strong> ~11,8 km (~13 min autem lokalną drogą wierzchowinową omijającą DK 75!).</p>
+        <div style="margin-top:6px;">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${homeEmilCoords[0]},${homeEmilCoords[1]}&travelmode=driving" target="_blank" class="btn-action" style="font-size:0.72rem; padding:4px 8px;">🚗 Prowadź do Domu</a>
+        </div>
       </div>
     `);
 
@@ -839,6 +1071,7 @@
         <h4 style="color:#a78bfa;">👴 Dom Dziadków (Łososina Dolna 95)</h4>
         <p><strong>Współrzędne:</strong> 49.75838° N, 20.63301° E</p>
         <p>Sąsiednia posesja na grzbiecie Równi (~57 m na południe od domu rodzinnego).</p>
+        ${getRoutingLinksHtml(dziadkowieCoords[0], dziadkowieCoords[1], 'Dom Dziadków')}
       </div>
     `);
 
@@ -848,6 +1081,7 @@
         <h4 style="color:#f472b6;">🌸 Kwiaciarnia Mamy (Łososina Dolna 80)</h4>
         <p><strong>Współrzędne:</strong> 49.74081° N, 20.62211° E</p>
         <p>Centrum Łososiny Dolnej (rejon Starej Plebanii). Punkt logistyczny w dolinie.</p>
+        ${getRoutingLinksHtml(mamaCoords[0], mamaCoords[1], 'Kwiaciarnia Mamy')}
       </div>
     `);
 
@@ -862,6 +1096,7 @@
           <li>Czas do Nowego Sącza: <strong>~10 min</strong></li>
           <li>Nowoczesny peron, duży parking Park&Ride</li>
         </ul>
+        ${getRoutingLinksHtml(chomraniceCoords[0], chomraniceCoords[1], 'Stacja Chomranice')}
       </div>
     `);
 
@@ -871,10 +1106,11 @@
         <h4>🚉 Stacja Marcinkowice (LK 104)</h4>
         <p><strong>Status:</strong> Zmodernizowana, ruch pociągów POLREGIO wznowiony!</p>
         <p>14 par pociągów na dobę do Nowego Sącza.</p>
+        ${getRoutingLinksHtml(marcinkowiceCoords[0], marcinkowiceCoords[1], 'Stacja Marcinkowice')}
       </div>
     `);
 
-    // Pozostałe kluczowe stacje i obiekty
+    // Pozostałe stacje
     L.marker([49.6800, 20.5250], { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup("<b>🚉 Stacja Męcina (LK 104)</b><br>Wylot tunelu T13 (3,86 km). Czas do Krakowa: ~45 min.");
     L.marker([49.6880, 20.4850], { icon: createIconDiv('🚇', '#7c3aed', '#fef08a') }).addTo(map).bindPopup("<b>🚇 Tunel T13 (3,86 km)</b><br>Najdłuższy tunel w Małopolsce! Przebity pod Pisarzową i Męciną.");
     L.marker([49.7080, 20.4250], { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup("<b>🚉 Stacja Limanowa</b><br>Węzeł komunikacyjny Beskidu Wyspowego.");
@@ -937,15 +1173,62 @@
       </div>
     `);
 
-    // 9. INTELIGENTNY SKANER DZIAŁKI (KLIK W MAPĘ)
+    // 9. ARCHITEKTURA TRYBÓW INTERAKCJI (NEUTRAL vs SCOUT vs ADD)
+    let currentInteractionMode = 'neutral'; // 'neutral' | 'scout' | 'add'
     let scoutLineHome = null;
     let scoutLineStation = null;
     let scoutMarker = null;
     let lastScoutCoords = null;
 
+    function setInteractionMode(mode) {
+      currentInteractionMode = mode;
+      
+      // Aktualizacja stylów przycisków w toolbarze
+      document.getElementById('btn-mode-neutral').classList.toggle('active', mode === 'neutral');
+      document.getElementById('btn-mode-scout').classList.toggle('active', mode === 'scout');
+      document.getElementById('btn-mode-add').classList.toggle('active', mode === 'add');
+      
+      const mapContainer = document.getElementById('map');
+      const hintBanner = document.getElementById('mode-hint-banner');
+      
+      if (mode === 'add') {
+        mapContainer.style.cursor = 'crosshair';
+        hintBanner.style.display = 'flex';
+      } else if (mode === 'scout') {
+        mapContainer.style.cursor = 'pointer';
+        hintBanner.style.display = 'none';
+      } else {
+        mapContainer.style.cursor = '';
+        hintBanner.style.display = 'none';
+      }
+    }
+
+    // OBSŁUGA KLIKNIĘCIA W MAPĘ Z BRAMKĄ TRYBÓW
     map.on('click', function(e) {
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
+      
+      // TRYB 1: NEUTRALNY (PRZEGLĄDANIE) -> NIC NIE RYSUJEMY NA ŚLEPO!
+      if (currentInteractionMode === 'neutral') {
+        return; // Swobodne przeglądanie mapy!
+      }
+      
+      // TRYB 2: DODAWANIE PUNKTU (BEZPOŚREDNIO KLIKIEM NA MAPIE)
+      if (currentInteractionMode === 'add') {
+        openAddPointModal(lat, lng, '');
+        // Po otwarciu modala przywracamy tryb neutralny, by kolejne kliknięcie nie dodawało znowu
+        setInteractionMode('neutral');
+        return;
+      }
+      
+      // TRYB 3: INTELIGENTNY SKANER DZIAŁKI
+      if (currentInteractionMode === 'scout') {
+        executeScoutAnalysis(lat, lng);
+      }
+    });
+
+    // ANALIZA DZIAŁKI I MULTIMODALNYCH TRAS
+    function executeScoutAnalysis(lat, lng) {
       const clickLatLng = L.latLng(lat, lng);
       lastScoutCoords = { lat, lng };
       
@@ -955,11 +1238,16 @@
       
       const nearestDist = Math.min(distToChomranice, distToMarcinkowice);
       const nearestStationName = distToChomranice <= distToMarcinkowice ? "Chomranice" : "Marcinkowice";
+      const nearestStationCoords = distToChomranice <= distToMarcinkowice ? chomraniceCoords : marcinkowiceCoords;
       
-      const walkMin = Math.round(nearestDist / 80);
-      const bikeMin = Math.round(nearestDist / 250);
-      const carMinStation = Math.max(2, Math.round(nearestDist / 600));
-      const carMinHome = Math.max(3, Math.round((distToHome * 1.3) / 600));
+      // Realne czasy z uwzględnieniem dróg podgórskich (współczynnik 1.3x)
+      const distRoadStationKm = ((nearestDist * 1.25) / 1000).toFixed(1);
+      const distRoadHomeKm = ((distToHome * 1.30) / 1000).toFixed(1);
+      
+      const walkMin = Math.round((nearestDist * 1.2) / 75); // ~4.5 km/h
+      const bikeMin = Math.round((nearestDist * 1.2) / 280); // ~17 km/h
+      const carMinStation = Math.max(2, Math.round((distRoadStationKm / 45) * 60)); // ~45 km/h
+      const carMinHome = Math.max(3, Math.round((distRoadHomeKm / 48) * 60)); // ~48 km/h
       
       let acousticRating = "";
       if (nearestDist < 350) {
@@ -970,14 +1258,13 @@
         acousticRating = '<span class="badge-rating rating-good">🚗 > 1.6km: Wymaga auta / e-bike</span>';
       }
 
-      const geoportalUrl = `https://mapy.geoportal.gov.pl/imap/Imgp_2.html?locale=pl&gui=new&session=&zoom=17&xy=${lng},${lat}`;
-      const sopoUrl = `https://osuwiska.pgi.gov.pl/`;
-
+      // Usuń poprzednie linie, jeśli istniały
       if (scoutLineHome) map.removeLayer(scoutLineHome);
       if (scoutLineStation) map.removeLayer(scoutLineStation);
       if (scoutMarker) map.removeLayer(scoutMarker);
 
-      scoutLineStation = L.polyline([L.latLng(chomraniceCoords), clickLatLng], {
+      // Narysuj nowe linie
+      scoutLineStation = L.polyline([L.latLng(nearestStationCoords), clickLatLng], {
         color: '#f59e0b',
         weight: 3,
         dashArray: '5, 5'
@@ -996,6 +1283,18 @@
         fillOpacity: 0.95
       }).addTo(map);
 
+      // Pokaż pływający przycisk czyszczenia na mapie i w sidebarze
+      document.getElementById('floating-clear-scout').style.display = 'inline-flex';
+      document.getElementById('btn-clear-scout-sidebar').classList.remove('hidden');
+
+      // Linki nawigacji
+      const gmapsCarStation = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${nearestStationCoords[0]},${nearestStationCoords[1]}&travelmode=driving`;
+      const gmapsCarHome = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${homeEmilCoords[0]},${homeEmilCoords[1]}&travelmode=driving`;
+      const gmapsWalkStation = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${nearestStationCoords[0]},${nearestStationCoords[1]}&travelmode=walking`;
+      const geoportalUrl = `https://mapy.geoportal.gov.pl/imap/Imgp_2.html?locale=pl&gui=new&session=&zoom=17&xy=${lng},${lat}`;
+      const sopoUrl = `https://osuwiska.pgi.gov.pl/`;
+      const epodroznikUrl = `https://www.e-podroznik.pl/`;
+
       const infoBox = document.getElementById('plot-analysis-box');
       infoBox.style.display = 'block';
       infoBox.innerHTML = `
@@ -1003,27 +1302,70 @@
           <span>📍 Parcela (${lat.toFixed(5)}°N, ${lng.toFixed(5)}°E)</span>
           ${acousticRating}
         </div>
-        <div style="margin: 6px 0;">
-          🚉 Do stacji <strong>${nearestStationName}</strong>: <strong>${(nearestDist/1000).toFixed(2)} km</strong><br>
-          <span style="color:#94a3b8;">🚶 Spacer: <strong>~${walkMin} min</strong> | 🚲 Rower: <strong>~${bikeMin} min</strong> | 🚗 Auto: <strong>~${carMinStation} min</strong></span>
+        
+        <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:8px; margin:6px 0;">
+          <div style="font-weight:700; color:#fbbf24; font-size:0.77rem; margin-bottom:3px;">
+            🚉 Dojazd do stacji ${nearestStationName} (~${distRoadStationKm} km drogą):
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:0.75rem;">
+            <span>🚗 Auto: <strong>~${carMinStation} min</strong></span>
+            <span>🚲 Rower: <strong>~${bikeMin} min</strong></span>
+            <span>🚶 Spacer: <strong>~${walkMin} min</strong></span>
+          </div>
+          <div style="display:flex; gap:5px; margin-top:5px;">
+            <a href="${gmapsCarStation}" target="_blank" class="btn-route-link" style="color:#fbbf24;">🚗 Trasa do stacji</a>
+            <a href="${gmapsWalkStation}" target="_blank" class="btn-route-link">🚶 Pieszo do stacji</a>
+          </div>
         </div>
-        <div style="margin: 6px 0;">
-          🏡 Do rodziców w <strong>Łososinie 375</strong>: <strong>${(distToHome/1000).toFixed(2)} km</strong><br>
-          <span style="color:#94a3b8;">🚗 Auto lokalną wierzchowiną: <strong>~${carMinHome} min</strong></span>
+
+        <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:8px; margin:6px 0;">
+          <div style="font-weight:700; color:#ef4444; font-size:0.77rem; margin-bottom:3px;">
+            🏡 Dojazd do rodziców (Łososina 375):
+          </div>
+          <div style="font-size:0.75rem;">
+            Dystans wierzchowiną: <strong>~${distRoadHomeKm} km</strong> | 🚗 Auto: <strong>~${carMinHome} min</strong>
+          </div>
+          <div style="margin-top:5px;">
+            <a href="${gmapsCarHome}" target="_blank" class="btn-route-link" style="color:#f87171;">🚗 Trasa wierzchowinowa do rodziców</a>
+          </div>
         </div>
-        <div style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
+
+        <div style="margin-top: 8px; display: flex; gap: 5px; flex-wrap: wrap;">
           <a href="${geoportalUrl}" target="_blank" class="btn-action" style="font-size:0.72rem; padding:5px 8px; background:#0284c7;">
-            🗺️ Sprawdź Działkę w Geoportalu
+            🗺️ Geoportal EGIB
           </a>
           <a href="${sopoUrl}" target="_blank" class="btn-action btn-slate" style="font-size:0.72rem; padding:5px 8px;">
             🛡️ Osuwiska SOPO
+          </a>
+          <a href="${epodroznikUrl}" target="_blank" class="btn-action btn-purple" style="font-size:0.72rem; padding:5px 8px;">
+            🎫 e-podróżnik
           </a>
           <button onclick="saveCurrentScoutAsPlot()" class="btn-action btn-emerald" style="font-size:0.72rem; padding:5px 8px;">
             💾 Zapisz jako moją działkę
           </button>
         </div>
       `;
-    });
+
+      // Otwórz sidebar na telefonie, by użytkownik widział wynik
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.add('mobile-open');
+      }
+    }
+
+    // CZYSZCZENIE LINII I POMIARU (CLEAR / UNDO)
+    function clearScoutAnalysis() {
+      if (scoutLineHome) { map.removeLayer(scoutLineHome); scoutLineHome = null; }
+      if (scoutLineStation) { map.removeLayer(scoutLineStation); scoutLineStation = null; }
+      if (scoutMarker) { map.removeLayer(scoutMarker); scoutMarker = null; }
+      lastScoutCoords = null;
+      
+      const infoBox = document.getElementById('plot-analysis-box');
+      infoBox.style.display = 'none';
+      infoBox.innerHTML = '';
+      
+      document.getElementById('floating-clear-scout').style.display = 'none';
+      document.getElementById('btn-clear-scout-sidebar').classList.add('hidden');
+    }
 
     // 10. TWOJA BAZA MIEJSC (PERSONAL GIS & LIFE HUB ENGINE)
     const DEFAULT_USER_POINTS = [
@@ -1056,7 +1398,7 @@
       },
       {
         id: 'plot-zawadka-recom',
-        name: 'Przykładowa Działka Zawadka (Widok Tatry)',
+        name: 'Rekomendowana Działka Zawadka',
         category: 'plot',
         lat: 49.6985,
         lng: 20.6180,
@@ -1070,7 +1412,7 @@
     let markersMap = {};
 
     function loadUserPoints() {
-      const saved = localStorage.getItem('emil_life_hub_points_v2');
+      const saved = localStorage.getItem('emil_life_hub_points_v3');
       if (saved) {
         try {
           userPoints = JSON.parse(saved);
@@ -1085,14 +1427,15 @@
     }
 
     function saveUserPointsToStorage() {
-      localStorage.setItem('emil_life_hub_points_v2', JSON.stringify(userPoints));
+      localStorage.setItem('emil_life_hub_points_v3', JSON.stringify(userPoints));
     }
 
     function getCategoryEmoji(cat) {
       switch(cat) {
-        case 'plot': return '🏡';
         case 'family': return '👨‍👩‍👧';
         case 'friends': return '🤝';
+        case 'plot': return '🏡';
+        case 'pros': return '🚜';
         case 'neighbors': return '🏘️';
         case 'bess': return '⚡';
         case 'note': return '📌';
@@ -1102,11 +1445,12 @@
 
     function getCategoryColor(cat) {
       switch(cat) {
-        case 'plot': return '#10b981';
         case 'family': return '#8b5cf6';
         case 'friends': return '#f59e0b';
+        case 'plot': return '#10b981';
+        case 'pros': return '#06b6d4';
         case 'neighbors': return '#0284c7';
-        case 'bess': return '#06b6d4';
+        case 'bess': return '#eab308';
         case 'note': return '#ec4899';
         default: return '#64748b';
       }
@@ -1130,13 +1474,18 @@
           draggable: !p.isDefault
         }).addTo(layerUserPoints);
 
+        const routingHtml = getRoutingLinksHtml(p.lat, p.lng, p.name);
+        const deleteBtnHtml = !p.isDefault ? `<button onclick="deletePointDirect('${p.id}')" class="btn-action btn-red" style="padding:3px 7px; font-size:0.7rem;">🗑️ Usuń</button>` : '';
+
         m.bindPopup(`
           <div class="custom-popup">
             <h4 style="color:${color};">${emoji} ${p.name}</h4>
             <p>${p.desc || 'Brak dodatkowego opisu.'}</p>
-            <p style="font-size:0.75rem; color:#94a3b8;">${p.lat.toFixed(5)}° N, ${p.lng.toFixed(5)}° E</p>
-            <div style="margin-top:6px; display:flex; gap:6px;">
-              <button onclick="editPointModal('${p.id}')" class="btn-action btn-slate" style="padding:3px 7px; font-size:0.7rem;">Edytuj</button>
+            <p style="font-size:0.74rem; color:#94a3b8;">${p.lat.toFixed(5)}° N, ${p.lng.toFixed(5)}° E</p>
+            ${routingHtml}
+            <div style="margin-top:8px; display:flex; gap:6px;">
+              <button onclick="editPointModal('${p.id}')" class="btn-action btn-slate" style="padding:3px 7px; font-size:0.7rem;">✏️ Edytuj</button>
+              ${deleteBtnHtml}
             </div>
           </div>
         `);
@@ -1169,7 +1518,7 @@
       });
 
       if (filtered.length === 0) {
-        listContainer.innerHTML = '<div style="color:#64748b; font-size:0.75rem; text-align:center; padding:10px;">Brak punktów w tej kategorii.</div>';
+        listContainer.innerHTML = '<div style="color:#64748b; font-size:0.75rem; text-align:center; padding:10px;">Brak punktów w tej kategorii. Kliknij <strong>➕ Dodaj Punkt na Mapie</strong> powyżej!</div>';
       }
     }
 
@@ -1185,7 +1534,6 @@
       if (!p) return;
       map.flyTo([p.lat, p.lng], 16, { duration: 1.2 });
       if (markersMap[id]) markersMap[id].openPopup();
-      // Jeśli na telefonie, zamknij sidebar po kliknięciu
       if (window.innerWidth <= 768) {
         document.getElementById('sidebar').classList.remove('mobile-open');
       }
@@ -1196,17 +1544,19 @@
       document.getElementById('modal-point-title').innerHTML = '<span>➕ Dodaj Nowy Punkt</span><button onclick="closePointModal()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>';
       document.getElementById('modal-point-id').value = '';
       document.getElementById('modal-point-name').value = defaultName || '';
-      document.getElementById('modal-point-category').value = 'plot';
+      document.getElementById('modal-point-category').value = 'family';
       document.getElementById('modal-point-lat').value = (lat || map.getCenter().lat).toFixed(6);
       document.getElementById('modal-point-lng').value = (lng || map.getCenter().lng).toFixed(6);
       document.getElementById('modal-point-desc').value = '';
       document.getElementById('btn-delete-point').classList.add('hidden');
       document.getElementById('point-modal').classList.add('active');
+      setTimeout(() => document.getElementById('modal-point-name').focus(), 100);
     }
 
     function saveCurrentScoutAsPlot() {
       if (!lastScoutCoords) return;
       openAddPointModal(lastScoutCoords.lat, lastScoutCoords.lng, 'Obserwowana Działka');
+      document.getElementById('modal-point-category').value = 'plot';
     }
 
     function editPointModal(id) {
@@ -1215,7 +1565,7 @@
       document.getElementById('modal-point-title').innerHTML = '<span>✏️ Edytuj Punkt</span><button onclick="closePointModal()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>';
       document.getElementById('modal-point-id').value = p.id;
       document.getElementById('modal-point-name').value = p.name;
-      document.getElementById('modal-point-category').value = p.category || 'plot';
+      document.getElementById('modal-point-category').value = p.category || 'family';
       document.getElementById('modal-point-lat').value = p.lat.toFixed(6);
       document.getElementById('modal-point-lng').value = p.lng.toFixed(6);
       document.getElementById('modal-point-desc').value = p.desc || '';
@@ -1265,12 +1615,22 @@
 
     function deleteCurrentPoint() {
       const id = document.getElementById('modal-point-id').value;
+      deletePointDirect(id);
+      closePointModal();
+    }
+
+    function deletePointDirect(id) {
       if (!id) return;
-      if (confirm('Czy na pewno chcesz usunąć ten punkt?')) {
+      const p = userPoints.find(item => item.id === id);
+      if (!p) return;
+      if (p.isDefault) {
+        alert('Ten punkt jest chroniony jako element stałej infrastruktury.');
+        return;
+      }
+      if (confirm(`Czy na pewno chcesz usunąć punkt "${p.name}"?`)) {
         userPoints = userPoints.filter(item => item.id !== id);
         saveUserPointsToStorage();
         renderUserPoints();
-        closePointModal();
       }
     }
 
