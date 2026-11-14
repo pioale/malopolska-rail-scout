@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="pl" class="h-full bg-slate-950 text-slate-100">
+<html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Małopolska Rail & Life Hub – Emil</title>
-  <meta name="description" content="Mobilny Analizator Działek, Kolej Podłęże-Piekiełko (LK 104/622) i Osobisty Geoportal dla Emila" />
+  <meta charset="UTF-8">
+  <title>Rzeczywista Sieć Kolejowa Małopolski & Smart Plot Scout – Emil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
   <!-- PWA & Mobile Meta -->
   <meta name="theme-color" content="#0f172a" />
@@ -17,1195 +16,1238 @@
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Tailwind CDN for Mobile UI -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f9ff',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
+  
   <style>
-    /* Mobile-first base styles */
-    * { -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; width: 100%; overflow: hidden; touch-action: manipulation; }
-    #map { height: 100%; width: 100%; z-index: 1; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0b1120;
+      color: #f1f5f9;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* GŁÓWNY NAGŁÓWEK APLIKACJI */
+    header {
+      height: 64px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 1000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+    
+    .title-area h1 {
+      font-size: 1.12rem;
+      margin: 0;
+      color: #38bdf8;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .title-area p {
+      font-size: 0.76rem;
+      margin: 2px 0 0 0;
+      color: #94a3b8;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-    /* Custom scrollbars */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .badges {
+      display: flex;
+      gap: 8px;
+    }
+    .badge {
+      font-size: 0.70rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
 
-    /* Leaflet UI adjustments for mobile */
-    .leaflet-control-zoom { border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important; margin-left: 14px !important; margin-top: 70px !important; }
-    .leaflet-control-zoom a { background-color: #0f172a !important; color: #f8fafc !important; border-bottom: 1px solid #1e293b !important; width: 36px !important; height: 36px !important; line-height: 36px !important; border-radius: 8px !important; }
-    .leaflet-control-attribution { background: rgba(15, 23, 42, 0.75) !important; color: #94a3b8 !important; font-size: 9px !important; backdrop-filter: blur(4px); }
-    .leaflet-control-attribution a { color: #38bdf8 !important; }
+    .btn-head {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s;
+    }
+    .btn-head:hover { background: #334155; }
+    .btn-head:active { transform: scale(0.97); }
+    .btn-head.btn-pwa { background: #0284c7; color: white; border-color: #38bdf8; }
+    .btn-head.btn-mobile-only { display: none; }
 
-    /* Custom Leaflet Popups */
+    /* KONTENER GŁÓWNY: MAPA + BOCZNY PANEL */
+    #main-container {
+      display: flex;
+      height: calc(100vh - 64px);
+      width: 100vw;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #map {
+      flex: 1;
+      height: 100%;
+      background: #1e293b;
+      z-index: 1;
+    }
+    
+    /* KLASYCZNY, CZYTELNY SIDEBAR (430px) */
+    #sidebar {
+      width: 440px;
+      height: 100%;
+      background: #0f172a;
+      border-left: 1px solid #1e293b;
+      overflow-y: auto;
+      padding: 16px;
+      font-size: 0.83rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      z-index: 500;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 8px;
+    }
+    .sidebar-header h2 {
+      font-size: 1.05rem;
+      color: #38bdf8;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-close-mobile {
+      display: none;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+    
+    /* KARTY W SIDEBARZE */
+    .card {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 13px;
+      border: 1px solid #334155;
+    }
+    .card-title {
+      font-weight: 700;
+      color: #f8fafc;
+      font-size: 0.86rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .metric {
+      font-weight: 700;
+      color: #34d399;
+    }
+    
+    /* PRZYCISKI AKCJI */
+    .btn-nav-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.05s;
+    }
+    .btn-action:hover { background: #0369a1; }
+    .btn-action:active { transform: scale(0.98); }
+    .btn-gold { background: #d97706; }
+    .btn-gold:hover { background: #b45309; }
+    .btn-emerald { background: #059669; }
+    .btn-emerald:hover { background: #047857; }
+    .btn-purple { background: #7c3aed; }
+    .btn-purple:hover { background: #6d28d9; }
+    .btn-slate { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
+    .btn-slate:hover { background: #475569; color: white; }
+
+    /* TABELA CZASÓW */
+    .time-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 0.78rem;
+    }
+    .time-table th, .time-table td {
+      padding: 5px 8px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+    .time-table th {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    
+    /* LEGENDA LINII */
+    .legend-box {
+      margin-top: 6px;
+      font-size: 0.77rem;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .line-indicator {
+      width: 24px;
+      height: 4px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    
+    /* POPUPY LEAFLETA */
     .leaflet-popup-content-wrapper {
       background: #0f172a !important;
-      color: #f8fafc !important;
+      color: #f1f5f9 !important;
       border: 1px solid #334155 !important;
-      border-radius: 14px !important;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
-      padding: 4px !important;
+      border-radius: 10px !important;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.7) !important;
+      padding: 3px !important;
     }
-    .leaflet-popup-tip { background: #0f172a !important; border: 1px solid #334155 !important; }
-    .leaflet-popup-close-button { color: #94a3b8 !important; padding: 6px !important; }
+    .leaflet-popup-tip { background: #0f172a !important; }
+    .custom-popup h4 { margin: 0 0 6px 0; font-size: 0.95rem; color: #38bdf8; }
+    .custom-popup p { margin: 4px 0; font-size: 0.8rem; color: #cbd5e1; }
+    .custom-popup ul { margin: 4px 0 0 16px; padding: 0; font-size: 0.78rem; }
+    
+    /* ANALIZATOR DZIAŁKI */
+    #plot-analysis-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid #38bdf8;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      display: none;
+    }
+    .analysis-header {
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .badge-rating {
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .rating-ideal { background: #065f46; color: #34d399; }
+    .rating-good { background: #1e3a8a; color: #60a5fa; }
+    .rating-noisy { background: #7c2d12; color: #f87171; }
 
-    /* Pulsing GPS dot */
-    .gps-marker-pulse {
-      width: 18px;
-      height: 18px;
-      background: #38bdf8;
-      border: 3px solid #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 15px #38bdf8;
-      position: relative;
+    /* STYLIZACJA KONTROLKI WARSTW (LEWY GÓRNY RÓG MAPY) */
+    .leaflet-control-layers {
+      background: rgba(15, 23, 42, 0.92) !important;
+      color: #f1f5f9 !important;
+      border: 1px solid #334155 !important;
+      border-radius: 10px !important;
+      padding: 10px 14px !important;
+      font-size: 0.78rem !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
+      backdrop-filter: blur(8px);
     }
-    .gps-marker-pulse::after {
-      content: '';
-      position: absolute;
-      top: -8px; left: -8px; right: -8px; bottom: -8px;
-      border-radius: 50%;
-      border: 2px solid #38bdf8;
-      animation: pulse 1.8s infinite;
+    .leaflet-control-layers-base label,
+    .leaflet-control-layers-overlays label {
+      margin: 4px 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      cursor: pointer !important;
     }
-    @keyframes pulse {
-      0% { transform: scale(0.6); opacity: 1; }
-      100% { transform: scale(2.2); opacity: 0; }
+    .leaflet-control-layers-separator {
+      border-top: 1px solid #334155 !important;
+      margin: 8px 0 !important;
+    }
+    .leaflet-control-layers input {
+      margin-right: 8px !important;
+      accent-color: #38bdf8 !important;
+    }
+    .leaflet-control-zoom {
+      border: none !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+    }
+    .leaflet-control-zoom a {
+      background: #0f172a !important;
+      color: #f8fafc !important;
+      border-bottom: 1px solid #1e293b !important;
     }
 
-    /* Bottom sheet transitions */
-    .bottom-sheet {
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    /* PERSONAL GIS / BAZA MIEJSC W SIDEBARZE */
+    .gis-filter-bar {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      margin-top: 6px;
     }
+    .gis-pill {
+      background: #334155;
+      color: #94a3b8;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .gis-pill.active {
+      background: #0284c7;
+      color: white;
+      font-weight: 700;
+    }
+    .points-list {
+      max-height: 240px;
+      overflow-y: auto;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .point-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 7px;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .point-card:hover {
+      border-color: #38bdf8;
+    }
+    .point-info {
+      max-width: 280px;
+    }
+    .point-name {
+      font-weight: 700;
+      color: white;
+      font-size: 0.80rem;
+    }
+    .point-desc {
+      color: #94a3b8;
+      font-size: 0.71rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* MODAL FORMULARZA DODAWANIA / EDYCJI PUNKTU */
+    #point-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #point-modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 440px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      font-size: 0.82rem;
+    }
+    .modal-content h3 {
+      margin: 0 0 12px 0;
+      color: #38bdf8;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: white;
+      font-size: 0.8rem;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid #1e293b;
+    }
+
+    /* RESPONSYWNOŚĆ DLA URZĄDZEŃ MOBILNYCH (BEZ DOLNEGO DRAWERA!) */
+    @media (max-width: 768px) {
+      header {
+        height: 54px;
+        padding: 0 12px;
+      }
+      .title-area h1 {
+        font-size: 0.95rem;
+      }
+      .title-area p {
+        display: none;
+      }
+      .badges {
+        display: none;
+      }
+      .btn-head.btn-mobile-only {
+        display: inline-flex;
+        background: #0284c7;
+        color: white;
+      }
+      #main-container {
+        height: calc(100vh - 54px);
+      }
+      /* Na telefonie sidebar jest pełnoekranowym lub wysuwanym z boku panelem na żądanie */
+      #sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 400px;
+        height: 100%;
+        transform: translateX(100%);
+        transition: transform 0.25s ease-in-out;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+      }
+      #sidebar.mobile-open {
+        transform: translateX(0);
+      }
+      .btn-close-mobile {
+        display: block;
+      }
+      .leaflet-control-layers {
+        max-width: 250px;
+        font-size: 0.72rem !important;
+      }
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
-<body class="flex flex-col h-full select-none">
+<body>
 
-  <!-- TOP APP HEADER -->
-  <header class="relative z-20 flex items-center justify-between px-3 py-2.5 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-lg">
-    <div class="flex items-center space-x-2.5">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center shadow-md shadow-sky-500/20 text-white font-bold text-lg">
-        🚄
-      </div>
-      <div>
-        <div class="flex items-center space-x-2">
-          <h1 class="text-sm font-bold tracking-tight text-white">Rail & Life Hub</h1>
-          <span class="px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">Emil • 2026</span>
-        </div>
-        <p class="text-[11px] text-slate-400 font-medium truncate max-w-[210px]">Łososina • LK 104 • Podłęże-Piekiełko</p>
-      </div>
+  <!-- 1. GŁÓWNY NAGŁÓWEK -->
+  <header>
+    <div class="title-area">
+      <h1><span>🚄</span> Rzeczywista Mapa Kolejowa Małopolski & Smart Plot Scout</h1>
+      <p>Korytarz Podłęże–Piekiełko (LK 104 / LK 622) vs Łososina Dolna | Weryfikator Działek & Geodezja</p>
     </div>
-
-    <!-- Quick action buttons -->
-    <div class="flex items-center space-x-1.5">
-      <!-- Install PWA button (shown if installable) -->
-      <button id="install-btn" class="hidden items-center space-x-1 px-2.5 py-1.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs rounded-lg shadow-sm transition active:scale-95">
-        <span>📲</span>
-        <span>Zainstaluj</span>
-      </button>
-
-      <!-- Layer switcher toggle -->
-      <button id="toggle-layers-btn" class="p-2 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg transition active:scale-95" title="Warstwy Mapy">
-        <i data-lucide="layers" class="w-4 h-4"></i>
-      </button>
-
-      <!-- Center to Home button -->
-      <button id="btn-quick-home" class="p-2 text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg transition active:scale-95" title="Dom Rodzinny (Łososina 375)">
-        <i data-lucide="home" class="w-4 h-4"></i>
-      </button>
+    
+    <div class="header-actions">
+      <div class="badges">
+        <span class="badge badge-green">POLREGIO: Sącz–Marcinkowice Czynne</span>
+        <span class="badge badge-amber">Tunel T13: 3,86 km Przebity</span>
+        <span class="badge badge-purple">Nowa LK 622: 160–200 km/h</span>
+      </div>
+      <button id="btn-gps" class="btn-head" title="Moja Pozycja GPS w terenie">🎯 GPS</button>
+      <button id="btn-install-pwa" class="btn-head btn-pwa hidden" title="Zainstaluj jako aplikację">📲 Zainstaluj</button>
+      <button id="btn-toggle-sidebar" class="btn-head btn-mobile-only" title="Otwórz / Zamknij Panel Działki">📋 Panel Działki</button>
     </div>
   </header>
 
-  <!-- LAYER SWITCHER POPUP MODAL -->
-  <div id="layer-modal" class="hidden fixed top-16 right-3 z-30 w-72 bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-2xl shadow-2xl p-4 text-xs space-y-3">
-    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-      <span class="font-bold text-slate-200 text-sm flex items-center space-x-1.5">
-        <i data-lucide="map" class="w-4 h-4 text-sky-400"></i>
-        <span>Podkład Mapy</span>
-      </span>
-      <button id="close-layers-btn" class="text-slate-400 hover:text-white">✕</button>
-    </div>
-    
-    <!-- Base Map Radios -->
-    <div class="space-y-1.5">
-      <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-800/60 cursor-pointer">
-        <input type="radio" name="basemap" value="street" checked class="accent-sky-400" />
-        <div>
-          <div class="font-semibold text-slate-200">Esri Streets (Drogowa)</div>
-          <div class="text-[10px] text-slate-400">Oficjalna numeracja, czyste ulice</div>
-        </div>
-      </label>
-      <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-800/60 cursor-pointer">
-        <input type="radio" name="basemap" value="sat" class="accent-sky-400" />
-        <div>
-          <div class="font-semibold text-slate-200">Esri Ortofotomapa (Satelita)</div>
-          <div class="text-[10px] text-slate-400">Zdjęcia lotnicze wysokiej rozdzielczości</div>
-        </div>
-      </label>
-      <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-800/60 cursor-pointer">
-        <input type="radio" name="basemap" value="topo" class="accent-sky-400" />
-        <div>
-          <div class="font-semibold text-slate-200">Esri Topo (Rzeźba terenu)</div>
-          <div class="text-[10px] text-slate-400">Poziomice, grzbiety, doliny</div>
-        </div>
-      </label>
-      <label class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-slate-800/60 cursor-pointer">
-        <input type="radio" name="basemap" value="opentopo" class="accent-sky-400" />
-        <div>
-          <div class="font-semibold text-slate-200">OpenTopoMap (Górska turystyka)</div>
-          <div class="text-[10px] text-slate-400">Cieniowanie szczytów i szlaki</div>
-        </div>
-      </label>
-    </div>
-
-    <!-- Railway Overlay Checkboxes -->
-    <div class="pt-2 border-t border-slate-800 space-y-1.5">
-      <div class="font-bold text-slate-300 text-[11px] mb-1">Warstwy Kolejowe:</div>
-      <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-slate-800 cursor-pointer text-slate-300">
-        <input type="checkbox" id="check-lk104-active" checked class="accent-emerald-400 rounded" />
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-        <span>LK 104 Czynna (Sącz - Marcinkowice)</span>
-      </label>
-      <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-slate-800 cursor-pointer text-slate-300">
-        <input type="checkbox" id="check-lk104-mod" checked class="accent-amber-400 rounded" />
-        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-        <span>LK 104 Modernizacja (do Limanowej)</span>
-      </label>
-      <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-slate-800 cursor-pointer text-slate-300">
-        <input type="checkbox" id="check-lk622" checked class="accent-purple-400 rounded" />
-        <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
-        <span>Nowa LK 622 (Podłęże - Tymbark)</span>
-      </label>
-      <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-slate-800 cursor-pointer text-slate-300">
-        <input type="checkbox" id="check-mainlines" checked class="accent-sky-400 rounded" />
-        <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-        <span>Magistrale (Kraków - Tarnów - Sącz)</span>
-      </label>
-    </div>
-  </div>
-
-  <!-- MAP CONTAINER -->
-  <main class="relative flex-1 w-full overflow-hidden">
+  <!-- 2. KONTENER GŁÓWNY -->
+  <div id="main-container">
+    <!-- MAPA -->
     <div id="map"></div>
-
-    <!-- FLOATING ACTION BUTTONS (Right Side) -->
-    <div class="absolute right-3.5 bottom-24 z-20 flex flex-col space-y-2.5">
-      <!-- GPS Locate Button -->
-      <button id="btn-gps" class="w-11 h-11 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-sky-400 border border-slate-700 shadow-xl flex items-center justify-center transition active:scale-90" title="Moja lokalizacja GPS">
-        <i data-lucide="crosshair" class="w-5 h-5"></i>
-      </button>
-
-      <!-- Center to Chomranice Station -->
-      <button id="btn-station" class="w-11 h-11 rounded-2xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 shadow-xl flex items-center justify-center transition active:scale-90" title="Stacja Chomranice (TOP 1)">
-        <span class="text-lg">🚉</span>
-      </button>
-
-      <!-- Add Point FAB -->
-      <button id="btn-add-point-fab" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-cyan-400 text-slate-950 shadow-lg shadow-sky-500/30 border border-sky-300/40 flex items-center justify-center transition active:scale-90 font-bold text-xl" title="Dodaj Punkt / Działkę">
-        <i data-lucide="plus" class="w-6 h-6"></i>
-      </button>
-    </div>
-
-    <!-- CLICK HELPER TOAST -->
-    <div id="click-helper-toast" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-20 px-4 py-2 bg-sky-600/90 backdrop-blur-md text-white text-xs font-semibold rounded-full shadow-xl border border-sky-400/40 animate-pulse flex items-center space-x-2">
-      <span>🎯 Kliknij w dowolne miejsce na mapie, aby dodać punkt!</span>
-      <button id="cancel-click-add" class="ml-2 text-sky-200 hover:text-white">✕</button>
-    </div>
-  </main>
-
-  <!-- BOTTOM DRAWER / INTERACTIVE HUB -->
-  <div id="bottom-sheet" class="bottom-sheet relative z-20 w-full bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 shadow-2xl flex flex-col" style="max-height: 80vh;">
     
-    <!-- DRAG HANDLE & QUICK TABS HEADER -->
-    <div class="flex flex-col border-b border-slate-800/80">
-      <!-- Little grab bar -->
-      <div id="drawer-drag-bar" class="w-full py-1.5 flex justify-center cursor-pointer">
-        <div class="w-10 h-1 bg-slate-700 rounded-full hover:bg-slate-600 transition"></div>
+    <!-- BOCZNY PANEL INFORMACYJNO-DECYZYJNY -->
+    <div id="sidebar">
+      <div class="sidebar-header">
+        <h2>🎯 Centrum Decyzyjne Działki</h2>
+        <button id="btn-close-sidebar-mobile" class="btn-close-mobile" title="Zamknij panel">✕</button>
       </div>
-
-      <!-- Quick Nav Tabs -->
-      <div class="flex items-center justify-around px-2 pb-2 text-xs font-semibold">
-        <button data-tab="scout" class="tab-btn flex-1 py-1.5 flex flex-col items-center space-y-1 text-sky-400 border-b-2 border-sky-400 transition">
-          <i data-lucide="compass" class="w-4 h-4"></i>
-          <span class="text-[11px]">Skaner Działki</span>
-        </button>
-        <button data-tab="points" class="tab-btn flex-1 py-1.5 flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition">
-          <i data-lucide="map-pin" class="w-4 h-4"></i>
-          <span class="text-[11px]">Baza Miejsc (<span id="points-count">0</span>)</span>
-        </button>
-        <button data-tab="railway" class="tab-btn flex-1 py-1.5 flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition">
-          <i data-lucide="train" class="w-4 h-4"></i>
-          <span class="text-[11px]">Kolej 2030</span>
-        </button>
-        <button data-tab="vision" class="tab-btn flex-1 py-1.5 flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span class="text-[11px]">Wizja & Hub</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- TAB CONTENTS CONTAINER -->
-    <div id="tab-content-area" class="flex-1 overflow-y-auto p-4 text-xs space-y-4" style="max-height: 48vh;">
       
-      <!-- TAB 1: SKANER DZIAŁKI (SCOUT) -->
-      <div id="tab-scout-content" class="space-y-3.5">
-        <div class="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-200 text-sm flex items-center space-x-1.5">
-              <span class="text-sky-400">📍</span>
-              <span id="scout-title">Kliknij na mapie, by zbadać parcelę</span>
-            </span>
-            <span id="scout-badge" class="px-2 py-0.5 text-[10px] bg-slate-700 text-slate-300 rounded-full font-medium">Czeka na klik</span>
-          </div>
-          <p id="scout-coords" class="text-[11px] text-slate-400 mt-1 font-mono">Współrzędne: 49.7589° N, 20.6328° E (Łososina Dolna 375)</p>
+      <!-- KARTA 1: SKOCZ DO KLUCZOWYCH REJONÓW -->
+      <div class="card">
+        <div class="card-title">
+          <span>📍 Skocz do Kluczowych Rejonów</span>
         </div>
-
-        <!-- Metric Cards Grid -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <!-- Distance to Station -->
-          <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/50">
-            <div class="text-slate-400 text-[10px] uppercase font-bold flex items-center justify-between">
-              <span>Do stacji kolejowej</span>
-              <span>🚉</span>
-            </div>
-            <div id="scout-dist-station" class="text-lg font-black text-amber-400 mt-0.5">~7.8 km</div>
-            <div id="scout-time-station" class="text-[10px] text-slate-400 mt-0.5">Chomranice: ~10 min autem</div>
-          </div>
-
-          <!-- Distance to Parents -->
-          <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/50">
-            <div class="text-slate-400 text-[10px] uppercase font-bold flex items-center justify-between">
-              <span>Do rodziców (Łososina 375)</span>
-              <span>🏡</span>
-            </div>
-            <div id="scout-dist-parents" class="text-lg font-black text-rose-400 mt-0.5">0.0 km</div>
-            <div id="scout-time-parents" class="text-[10px] text-slate-400 mt-0.5">Ominięcie korków DK 75</div>
-          </div>
+        <div class="btn-nav-grid">
+          <button class="btn-action btn-gold" onclick="focusHome()">🏡 Dom Emila (375)</button>
+          <button class="btn-action btn-purple" onclick="focusDziadkowie()">👴 Dom Dziadków (95)</button>
+          <button class="btn-action btn-slate" onclick="focusMama()">🌸 Kwiaciarnia (80)</button>
+          <button class="btn-action btn-emerald" onclick="focusChomranice()">🥇 Chomranice / Zawadka</button>
+          <button class="btn-action" onclick="focusMarcinkowice()">🚉 Marcinkowice</button>
+          <button class="btn-action" onclick="focusMalopolska()">🚄 Cała Małopolska</button>
         </div>
-
-        <!-- Acoustic & Geodetic Analysis -->
-        <div id="scout-acoustic-box" class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
-          <div class="font-bold text-emerald-400 flex items-center space-x-1.5">
-            <i data-lucide="volume-2" class="w-4 h-4"></i>
-            <span id="scout-acoustic-title">Optymalna strefa akustyczna</span>
-          </div>
-          <p id="scout-acoustic-desc" class="text-[11px] text-slate-300 mt-1 leading-relaxed">
-            Lokalizacja poza bezpośrednim hałasem torów (&gt;500 m) z zachowaniem błyskawicznego dojazdu rowerem lub autem do peronu Park&Ride.
-          </p>
-        </div>
-
-        <!-- External Geoportal & SOPO Links -->
-        <div class="grid grid-cols-2 gap-2">
-          <a id="btn-geoportal" href="https://mapy.geoportal.gov.pl/" target="_blank" class="flex items-center justify-center space-x-1.5 p-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-center shadow-sm transition active:scale-95">
-            <span>🗺️</span>
-            <span>Geoportal (EGIB)</span>
-          </a>
-          <a id="btn-sopo" href="https://osuwiska.pgi.gov.pl/" target="_blank" class="flex items-center justify-center space-x-1.5 p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-xl text-center transition active:scale-95">
-            <span>⛰️</span>
-            <span>Osuwiska SOPO</span>
-          </a>
-        </div>
-
-        <!-- Save as Custom Plot button -->
-        <button id="btn-save-as-point" class="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 transition active:scale-95">
-          <i data-lucide="bookmark-plus" class="w-4 h-4"></i>
-          <span>Zapisz tę lokalizację w Bazie Miejsc</span>
-        </button>
       </div>
 
-      <!-- TAB 2: BAZA MIEJSC (LIFE HUB) -->
-      <div id="tab-points-content" class="hidden space-y-3">
-        <!-- Search & Category Filters -->
-        <div class="space-y-2">
-          <div class="relative">
-            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
-            <input type="text" id="search-points" placeholder="Szukaj punktu, rodziny, działki..." class="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400" />
-          </div>
+      <!-- KARTA 2: INTELIGENTNY SKANER DZIAŁKI (KLIK W MAPĘ) -->
+      <div class="card" style="border-left: 4px solid #38bdf8;">
+        <div class="card-title">
+          <span>🔍 Inteligentny Skaner Działki (Kliknij na mapie)</span>
+        </div>
+        <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 6px 0;">
+          Kliknij w <strong>dowolne miejsce na mapie</strong> (np. oglądaną parcelę), aby wyliczyć dojazd lokalnymi drogami, sprawdzić strefę akustyczną i otworzyć ją w Geoportalu Krajowym!
+        </p>
+        <div id="plot-analysis-box"></div>
+      </div>
 
-          <!-- Category Pill Badges -->
-          <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 text-[11px]">
-            <button class="filter-pill px-2.5 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold whitespace-nowrap" data-cat="all">Wszystkie</button>
-            <button class="filter-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap" data-cat="family">👨‍👩‍👧 Rodzina</button>
-            <button class="filter-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap" data-cat="plot">🏡 Działki</button>
-            <button class="filter-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap" data-cat="friends">🤝 Znajomi</button>
-            <button class="filter-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap" data-cat="bess">⚡ BESS / OZE</button>
-            <button class="filter-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap" data-cat="note">📌 Notatki</button>
-          </div>
+      <!-- KARTA 3: TWOJA OSOBISTA BAZA MIEJSC (PERSONAL GIS & LIFE HUB) -->
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <div class="card-title">
+          <span>📍 Twoja Baza Miejsc & Działek</span>
+          <button class="btn-action btn-emerald" style="padding: 3px 8px; font-size: 0.72rem;" onclick="openAddPointModal()">+ Dodaj Punkt</button>
+        </div>
+        
+        <!-- Filtry kategorii -->
+        <div class="gis-filter-bar">
+          <button class="gis-pill active" onclick="filterCategory('all', this)">Wszystkie</button>
+          <button class="gis-pill" onclick="filterCategory('plot', this)">🏡 Działki</button>
+          <button class="gis-pill" onclick="filterCategory('family', this)">👨‍👩‍👧 Rodzina</button>
+          <button class="gis-pill" onclick="filterCategory('friends', this)">🤝 Znajomi</button>
+          <button class="gis-pill" onclick="filterCategory('bess', this)">⚡ BESS / OZE</button>
+          <button class="gis-pill" onclick="filterCategory('note', this)">📌 Notatki</button>
         </div>
 
-        <!-- Points List Container -->
-        <div id="points-list" class="space-y-2">
-          <!-- Rendered via JS -->
-        </div>
+        <!-- Lista punktów -->
+        <div id="user-points-container" class="points-list"></div>
 
-        <!-- Add Point Button inside tab -->
-        <button id="btn-add-point-manual" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-400 font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition active:scale-95">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          <span>Dodaj nowy punkt ręcznie</span>
-        </button>
-
-        <!-- Backup & Restore Buttons -->
-        <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-          <button id="btn-export-json" class="text-slate-400 hover:text-slate-200 flex items-center space-x-1">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-            <span>Pobierz kopię JSON</span>
-          </button>
-          <label class="text-slate-400 hover:text-slate-200 flex items-center space-x-1 cursor-pointer">
-            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-            <span>Wgraj JSON</span>
-            <input type="file" id="import-json-file" accept=".json" class="hidden" />
+        <!-- Kopia zapasowa JSON -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; pt-2; border-top:1px solid #334155; font-size:0.72rem;">
+          <button class="btn-action btn-slate" style="padding: 4px 8px;" onclick="exportPointsJSON()">💾 Pobierz kopię JSON</button>
+          <label class="btn-action btn-slate" style="padding: 4px 8px; cursor:pointer;">
+            📥 Wgraj JSON
+            <input type="file" id="input-import-json" accept=".json" style="display:none;" onchange="importPointsJSON(event)" />
           </label>
-          <button id="btn-reset-points" class="text-rose-400 hover:text-rose-300 flex items-center space-x-1">
-            <span>Reset</span>
-          </button>
         </div>
       </div>
 
-      <!-- TAB 3: KOLEJ PODŁĘŻE-PIEKIEŁKO (INFO & HARMONOGRAM) -->
-      <div id="tab-railway-content" class="hidden space-y-3.5">
-        <div class="p-3 bg-gradient-to-r from-sky-950/60 to-slate-900 border border-sky-500/30 rounded-xl">
-          <div class="font-bold text-sky-400 text-sm flex items-center space-x-2">
-            <span>🚄</span>
-            <span>Megaprojekt Podłęże-Piekiełko (LK 104 / 622)</span>
-          </div>
-          <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
-            Największa inwestycja kolejowa na południu Polski. Połączenie Nowego Sącza i Zakopanego z Krakowem w czasie poniżej 60 minut.
-          </p>
+      <!-- KARTA 4: ZŁOTY PAS REKOMENDACJI -->
+      <div class="card" style="border-left: 4px solid #f59e0b;">
+        <div class="card-title">
+          <span>🥇 Złoty Pas: Chomranice – Zawadka</span>
+          <span style="color:#fbbf24; font-size:0.73rem;">REKOMENDACJA ZŁOTA</span>
         </div>
+        <p><strong>Dojazd do rodziców w Łososinie 375:</strong> <span class="metric">~11,8 km / 13 minut</span> lokalną drogą wierzchowinową – <strong>100% ominięcie korków na DK 75</strong> nad Jeziorem Rożnowskim i Górą Just!</p>
+        <p><strong>Dojazd do nowej stacji kolejowej:</strong> <span class="metric">1,5–2,5 km (3 min autem / 8 min rowerem)</span> do nowego przystanku <strong>Chomranice (km 59+408)</strong> z parkingiem Park&Ride.</p>
+        <p><strong>Bezpieczeństwo geologiczne:</strong> Wierzchowina oparta na stabilnych piaskowcach magurskich – <strong>brak osuwisk</strong> (w odróżnieniu od zsuwowej Góry Just).</p>
+        <p><strong>Warunki pod Smart Dom & BESS:</strong> Południowo-zachodnie stoki, wzorcowa insolacja pod fotowoltaikę, pompę ciepła i magazyn energii.</p>
+      </div>
 
-        <!-- Travel Times Matrix -->
-        <div class="space-y-1.5">
-          <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Czasy Przejazdu ze stacji Chomranice:</div>
-          <div class="grid grid-cols-2 gap-2 text-[11px]">
-            <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60 flex items-center justify-between">
-              <span class="text-slate-300">Kraków Główny</span>
-              <span class="font-bold text-emerald-400">~50–52 min</span>
-            </div>
-            <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60 flex items-center justify-between">
-              <span class="text-slate-300">Nowy Sącz Gł.</span>
-              <span class="font-bold text-sky-400">~10 min (czynne)</span>
-            </div>
-            <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60 flex items-center justify-between">
-              <span class="text-slate-300">Warszawa Centr.</span>
-              <span class="font-bold text-amber-400">~3h 10 min (CMK)</span>
-            </div>
-            <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60 flex items-center justify-between">
-              <span class="text-slate-300">Zakopane</span>
-              <span class="font-bold text-purple-400">~1h 15 min</span>
-            </div>
-          </div>
+      <!-- KARTA 5: CZASY PRZEJAZDU POCIĄGIEM PO 2030 R. -->
+      <div class="card" style="border-left: 4px solid #a855f7;">
+        <div class="card-title">
+          <span>🚄 Czasy Podróży Koleją (po 2030 r.)</span>
         </div>
+        <table class="time-table">
+          <tr><th>Kierunek</th><th>Czas docelowy</th><th>Trasa</th></tr>
+          <tr><td>Kraków Główny</td><td><strong>~50–52 min</strong></td><td>LK 104 -> nowa LK 622 (2030+)</td></tr>
+          <tr><td>Nowy Sącz Gł.</td><td><strong>~10 min</strong></td><td>Czynne teraz (POLREGIO)</td></tr>
+          <tr><td>Zakopane</td><td><strong>~1h 15 min</strong></td><td>LK 104 -> Chabówka -> LK 99</td></tr>
+          <tr><td>Warszawa Centr.</td><td><strong>~3h 10 min</strong></td><td>przez Kraków (CMK Pendolino)</td></tr>
+          <tr><td>Gdańsk (Maja)</td><td><strong>~5h 45 min</strong></td><td>Pendolino przez Kraków</td></tr>
+          <tr><td>Łomża</td><td><strong>~5h 35 min</strong></td><td>reaktywowana 2026 (LK 49)!</td></tr>
+        </table>
+      </div>
 
-        <!-- Tunnels & Highlights -->
-        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/50 space-y-2">
-          <div class="font-bold text-slate-200 text-xs flex items-center space-x-1.5">
-            <i data-lucide="mountain" class="w-4 h-4 text-amber-400"></i>
-            <span>Kluczowe Obiekty Inżynieryjne:</span>
+      <!-- KARTA 6: LEGENDA LINII WEKTOROWYCH -->
+      <div class="card">
+        <div class="card-title">
+          <span>📋 Legenda Wektorowa Infrastruktury</span>
+        </div>
+        <div class="legend-box">
+          <div class="legend-row">
+            <div class="line-indicator" style="background:#10b981;"></div>
+            <span><strong>Zielona ciągła:</strong> LK 104 Czynna (Nowy Sącz – Marcinkowice, ruch Polregio)</span>
           </div>
-          <ul class="text-[11px] text-slate-300 space-y-1.5 list-disc list-inside">
-            <li><strong class="text-white">Tunel T13 (pod Małą Górą / Piekiełko):</strong> 3,86 km – najdłuższy tunel kolejowy w Polsce. Drążenie w toku!</li>
-            <li><strong class="text-white">Tunel T1, T2, T3:</strong> na odcinku Limanowa – Pisarzowa – Męcina.</li>
-            <li><strong class="text-white">Przystanek Chomranice (km 59+408):</strong> Peron jednokrawędziowy 200 m, oświetlenie LED, monitoring, nowoczesny parking Park&Ride przy drodze gminnej.</li>
-            <li><strong class="text-white">Termin oddania:</strong> LK 104 Nowy Sącz – Limanowa (2026/2027), cały korytarz LK 622 do Krakowa (2030).</li>
-          </ul>
+          <div class="legend-row">
+            <div class="line-indicator" style="background:#f59e0b; border-bottom: 2px dashed #f59e0b;"></div>
+            <span><strong>Bursztynowa przerywana:</strong> LK 104 w Modernizacji (Marcinkowice – Chomranice – Limanowa)</span>
+          </div>
+          <div class="legend-row">
+            <div class="line-indicator" style="background:#a855f7;"></div>
+            <span><strong>Fioletowa:</strong> Nowa Magistrala LK 622 (Podłęże – Gdów – Szczyrzyc – Tymbark, 160–200 km/h)</span>
+          </div>
+          <div class="legend-row">
+            <div class="line-indicator" style="background:#64748b;"></div>
+            <span><strong>Szara:</strong> Główne magistrale (Kraków – Tarnów – Sącz – Zakopane)</span>
+          </div>
+          <div class="legend-row">
+            <div class="line-indicator" style="background:#fbbf24; height: 10px; opacity: 0.4;"></div>
+            <span><strong>Złoty obszar:</strong> Rekomendowany pas działkowy Zawadka – Chomranice</span>
+          </div>
+          <div class="legend-row">
+            <div class="line-indicator" style="background:#38bdf8; border-bottom: 2px dotted #38bdf8;"></div>
+            <span><strong>Błękitna linia:</strong> Bezkorkowa droga wierzchowinowa do Łososiny Dolnej 375</span>
+          </div>
         </div>
       </div>
 
-      <!-- TAB 4: WIZJA STRATEGICZNA & ARCHITEKTURA (ROADMAP) -->
-      <div id="tab-vision-content" class="hidden space-y-3.5">
-        <div class="p-3 bg-gradient-to-r from-purple-950/60 to-slate-900 border border-purple-500/30 rounded-xl">
-          <div class="font-bold text-purple-300 text-sm flex items-center space-x-2">
-            <span>🌟</span>
-            <span>Strategia Rozwoju Life Hub dla Emila</span>
-          </div>
-          <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
-            Jak przekształcić to narzędzie w potężny, prywatny system decyzyjny łączący budowę domu, badania na AGH i codzienne życie.
-          </p>
+      <!-- KARTA 7: PORTALE PAŃSTWOWE -->
+      <div class="card">
+        <div class="card-title">
+          <span>🌐 Oficjalne Geoportale (Sprawdź Działkę)</span>
         </div>
-
-        <div class="space-y-2.5 text-[11px]">
-          <!-- Pillar 1 -->
-          <div class="p-2.5 bg-slate-800/60 rounded-xl border border-slate-700">
-            <div class="font-bold text-sky-400 flex items-center space-x-1.5">
-              <span>1️⃣</span>
-              <span>Scouting Działki 2027–2029 (Pre-emption)</span>
-            </div>
-            <p class="text-slate-300 mt-1 leading-relaxed">
-              Wczesne namierzanie parceli w Zawadce i Chomranicach przed oficjalnym otwarciem szybkiej kolei do Krakowa (wzrost cen gruntów o 80–120% po 2029 r.). Integracja z numerami działek i księgami wieczystymi.
-            </p>
-          </div>
-
-          <!-- Pillar 2 -->
-          <div class="p-2.5 bg-slate-800/60 rounded-xl border border-slate-700">
-            <div class="font-bold text-amber-400 flex items-center space-x-1.5">
-              <span>2️⃣</span>
-              <span>Badania BESS & Smart Grid (AGH Kraków)</span>
-            </div>
-            <p class="text-slate-300 mt-1 leading-relaxed">
-              Wykorzystanie mapy do analizy punktów przyłączenia stacji trakcyjnych, podstacji kolejowych i magazynów energii (BESS). Łączenie doktoratu/pracy magisterskiej z realną infrastrukturą Sądecczyzny.
-            </p>
-          </div>
-
-          <!-- Pillar 3 -->
-          <div class="p-2.5 bg-slate-800/60 rounded-xl border border-slate-700">
-            <div class="font-bold text-emerald-400 flex items-center space-x-1.5">
-              <span>3️⃣</span>
-              <span>Personal & Family Mobility Hub</span>
-            </div>
-            <p class="text-slate-300 mt-1 leading-relaxed">
-              Mapa relacji i logistyki: dom dziadków, kwiaciarnia mamy, lokalni zaufani fachowcy, zaprzyjaźnieni sąsiedzi, punkty widokowe i trasy rowerowe wzdłuż Jeziora Rożnowskiego.
-            </p>
-          </div>
-
-          <!-- Pillar 4 -->
-          <div class="p-2.5 bg-slate-800/60 rounded-xl border border-slate-700">
-            <div class="font-bold text-rose-400 flex items-center space-x-1.5">
-              <span>4️⃣</span>
-              <span>Odporność Energetyczna (Off-Grid Score)</span>
-            </div>
-            <p class="text-slate-300 mt-1 leading-relaxed">
-              Ocena każdej działki pod kątem nachylenia stoku (ekspozycja południowa), potencjału PV, pompy ciepła (odwierty pionowe) i stabilności geologicznej (unikanie fliszu osuwiskowego).
-            </p>
-          </div>
-        </div>
+        <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 0.79rem;">
+          <li><a href="https://mapy.geoportal.gov.pl/" target="_blank" style="color:#38bdf8; font-weight:600;">Geoportal.gov.pl (Działki katastralne EGIB i LIDAR NMT)</a></li>
+          <li><a href="https://osuwiska.pgi.gov.pl/" target="_blank" style="color:#38bdf8; font-weight:600;">Rejestr Osuwisk SOPO (Państwowy Instytut Geologiczny)</a></li>
+          <li><a href="https://mapa.plk-sa.pl/" target="_blank" style="color:#38bdf8;">MILK – Mapa Interaktywna Linii PKP PLK</a></li>
+          <li><a href="https://podleze-piekielko.pl/mapy-i-multimedia/mapy/" target="_blank" style="color:#38bdf8;">Oficjalne plany Podłęże–Piekiełko</a></li>
+        </ul>
       </div>
 
     </div>
   </div>
 
-  <!-- ADD / EDIT POINT MODAL DIALOG -->
-  <div id="point-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-t-3xl sm:rounded-2xl shadow-2xl p-5 text-xs space-y-4 max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200">
-      
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h3 id="modal-title" class="text-sm font-bold text-white flex items-center space-x-2">
-          <span>📍</span>
-          <span>Dodaj Nowy Punkt</span>
-        </h3>
-        <button id="close-modal-btn" class="text-slate-400 hover:text-white p-1">✕</button>
-      </div>
-
-      <form id="point-form" class="space-y-3.5">
-        <input type="hidden" id="form-point-id" />
-        <input type="hidden" id="form-point-lat" />
-        <input type="hidden" id="form-point-lng" />
-
-        <!-- Coordinates pill -->
-        <div class="p-2 bg-slate-800/60 rounded-xl border border-slate-700/60 text-[11px] font-mono text-slate-300 flex items-center justify-between">
-          <span>Współrzędne:</span>
-          <span id="modal-coords-display" class="text-sky-400 font-bold">49.7589° N, 20.6328° E</span>
+  <!-- MODAL: DODAWANIE / EDYCJA PUNKTU -->
+  <div id="point-modal">
+    <div class="modal-content">
+      <h3 id="modal-point-title">
+        <span>📍 Dodaj Punkt / Działkę</span>
+        <button onclick="closePointModal()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>
+      </h3>
+      <form id="point-form" onsubmit="savePointForm(event)">
+        <input type="hidden" id="modal-point-id" />
+        <div class="form-group">
+          <label>Nazwa Punktu:</label>
+          <input type="text" id="modal-point-name" required placeholder="np. Działka Zawadka z widokiem na Tatry, Dom Tomka..." />
         </div>
-
-        <!-- Name -->
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Nazwa punktu:</label>
-          <input type="text" id="form-point-name" required placeholder="np. Działka Zawadka z widokiem, Dom Marka..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-sky-400" />
-        </div>
-
-        <!-- Category -->
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Kategoria:</label>
-          <select id="form-point-category" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-sky-400">
+        <div class="form-group">
+          <label>Kategoria:</label>
+          <select id="modal-point-category">
             <option value="plot">🏡 Działka / Budowa Domu</option>
             <option value="family">👨‍👩‍👧 Rodzina / Bliscy</option>
             <option value="friends">🤝 Znajomi / Przyjaciele</option>
-            <option value="neighbors">🏘️ Sąsiedzi / Mieszkańcy</option>
+            <option value="neighbors">🏘️ Sąsiedzi</option>
             <option value="bess">⚡ BESS / Magazyn Energii / AGH</option>
             <option value="note">📌 Notatka / Pomysł</option>
-            <option value="other">⭐ Inne</option>
           </select>
         </div>
-
-        <!-- Note / Description -->
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Notatka i Szczegóły:</label>
-          <textarea id="form-point-desc" rows="3" placeholder="Opisz działkę, właściciela, kontakt, cenę, dojazd, spostrzeżenia..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-sky-400 resize-none"></textarea>
-        </div>
-
-        <!-- Color Selector -->
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1.5">Kolor znacznika:</label>
-          <div class="flex items-center space-x-3">
-            <label class="cursor-pointer"><input type="radio" name="point-color" value="#f43f5e" checked class="hidden peer"><span class="w-7 h-7 rounded-full bg-rose-500 inline-block peer-checked:ring-2 peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900 transition"></span></label>
-            <label class="cursor-pointer"><input type="radio" name="point-color" value="#38bdf8" class="hidden peer"><span class="w-7 h-7 rounded-full bg-sky-400 inline-block peer-checked:ring-2 peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900 transition"></span></label>
-            <label class="cursor-pointer"><input type="radio" name="point-color" value="#10b981" class="hidden peer"><span class="w-7 h-7 rounded-full bg-emerald-500 inline-block peer-checked:ring-2 peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900 transition"></span></label>
-            <label class="cursor-pointer"><input type="radio" name="point-color" value="#f59e0b" class="hidden peer"><span class="w-7 h-7 rounded-full bg-amber-500 inline-block peer-checked:ring-2 peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900 transition"></span></label>
-            <label class="cursor-pointer"><input type="radio" name="point-color" value="#8b5cf6" class="hidden peer"><span class="w-7 h-7 rounded-full bg-purple-500 inline-block peer-checked:ring-2 peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900 transition"></span></label>
-            <label class="cursor-pointer"><input type="radio" name="point-color" value="#ec4899" class="hidden peer"><span class="w-7 h-7 rounded-full bg-pink-500 inline-block peer-checked:ring-2 peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900 transition"></span></label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="form-group">
+            <label>Szerokość (Lat):</label>
+            <input type="number" step="0.000001" id="modal-point-lat" required />
+          </div>
+          <div class="form-group">
+            <label>Długość (Lng):</label>
+            <input type="number" step="0.000001" id="modal-point-lng" required />
           </div>
         </div>
-
-        <!-- Action buttons -->
-        <div class="pt-3 border-t border-slate-800 flex items-center justify-between space-x-2">
-          <button type="button" id="btn-delete-point" class="hidden px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold rounded-xl transition active:scale-95">
-            Usuń
-          </button>
-          <div class="flex-1 flex justify-end space-x-2">
-            <button type="button" id="btn-cancel-modal" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition active:scale-95">
-              Anuluj
-            </button>
-            <button type="submit" class="px-5 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl shadow-md transition active:scale-95">
-              Zapisz punkt
-            </button>
-          </div>
+        <div class="form-group">
+          <label>Opis i Notatki (cena, właściciel, dojazd, spostrzeżenia):</label>
+          <textarea id="modal-point-desc" rows="3" placeholder="Wpisz wszelkie szczegóły..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-delete-point" class="btn-action" style="background:#dc2626; margin-right:auto;" onclick="deleteCurrentPoint()">Usuń</button>
+          <button type="button" class="btn-action btn-slate" onclick="closePointModal()">Anuluj</button>
+          <button type="submit" class="btn-action btn-emerald">Zapisz Punkt</button>
         </div>
       </form>
-
     </div>
   </div>
 
-  <!-- LOAD EMBEDDED RAILWAY GEOMETRY -->
+  <!-- DANE WEKTOROWE LINII KOLEJOWYCH -->
   <script src="./railways_data.js"></script>
 
-  <!-- APP MAIN LOGIC SCRIPT -->
+  <!-- GŁÓWNY SKRYPT MAPY I APLIKACJI -->
   <script>
-    // --- APP CORE CONSTANTS ---
-    const COORDS_HOME = { lat: 49.7588975, lng: 20.6328272, name: 'Dom Rodzinny (Łososina 375)' };
-    const COORDS_DZIADKOWIE = { lat: 49.7583815, lng: 20.6330076, name: 'Dom Dziadków (Łososina 95)' };
-    const COORDS_KWIACIARNIA = { lat: 49.7408147, lng: 20.6221136, name: 'Kwiaciarnia Mamy (Łososina 80)' };
-    const COORDS_CHOMRANICE = { lat: 49.6912, lng: 20.6085, name: 'Stacja Chomranice (km 59+408)' };
-    const COORDS_MARCINKOWICE = { lat: 49.6642, lng: 20.6385, name: 'Stacja Marcinkowice (km 65+100)' };
-    const COORDS_MECINA = { lat: 49.7028, lng: 20.5512, name: 'Stacja Męcina (km 53+200)' };
+    // 1. ZWERYFIKOWANE PUNKTY ADRESOWE (DOKŁADNOŚĆ DO DACHU)
+    const homeEmilCoords = [49.7588975, 20.6328272];       // Łososina Dolna 375 (Dom Rodzinny Emila)
+    const dziadkowieCoords = [49.7583815, 20.6330076];     // Łososina Dolna 95 (Dom Dziadków)
+    const mamaCoords = [49.7408147, 20.6221136];           // Łososina Dolna 80 (Kwiaciarnia Mamy)
+    const chomraniceCoords = [49.6642, 20.6110];            // Nowy Przystanek Chomranice (km 59+408)
+    const marcinkowiceCoords = [49.6635, 20.6415];          // Stacja Marcinkowice
 
-    // --- BASEMAP TILE LAYERS (All 100% free, zero api keys, zero 403 blocks) ---
-    const tileLayers = {
-      street: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: 'Tiles &copy; Esri'
-      }),
-      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: 'Tiles &copy; Esri World Imagery'
-      }),
-      topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: 'Tiles &copy; Esri Topo'
-      }),
-      opentopo: L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17,
-        attribution: 'Map &copy; OpenTopoMap contributors'
-      })
-    };
-
-    // --- LEAFLET MAP INITIALIZATION ---
-    const map = L.map('map', {
-      center: [49.728, 20.625], // Centered between Łososina and Chomranice
-      zoom: 13,
-      zoomControl: false,
-      layers: [tileLayers.street]
+    // 2. PODKŁADY MAPOWE (100% BEZPŁATNE, BEZ KLUCZY API, BEZ 403)
+    const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri'
+    });
+    const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri World Imagery'
+    });
+    const esriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri Topo'
+    });
+    const openTopo = L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      attribution: 'Map &copy; OpenTopoMap contributors'
     });
 
-    L.control.zoom({ position: 'topleft' }).addTo(map);
+    // 3. INICJALIZACJA MAPY
+    const map = L.map('map', {
+      center: [49.7150, 20.6250],
+      zoom: 12,
+      layers: [esriStreet]
+    });
 
-    // --- GEOMETRY LAYER GROUPS ---
-    const layerGroupRailways = L.layerGroup().addTo(map);
-    const layerGroupPoints = L.layerGroup().addTo(map);
-    const layerGroupSpecial = L.layerGroup().addTo(map);
+    // 4. WARSTWY NAKŁADKOWE (OVERLAYS)
+    const layerLK104Active = L.layerGroup().addTo(map);
+    const layerLK104Mod = L.layerGroup().addTo(map);
+    const layerLK622 = L.layerGroup().addTo(map);
+    const layerMainlines = L.layerGroup().addTo(map);
+    const layerSpecialZones = L.layerGroup().addTo(map);
+    const layerUserPoints = L.layerGroup().addTo(map);
 
-    let activeScoutMarker = null;
-    let gpsMarker = null;
-    let gpsAccuracyCircle = null;
-    let clickToAddMode = false;
-
-    // --- HAVERSINE DISTANCE CALCULATOR ---
-    function calcDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // km
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-    }
-
-    // --- VECTOR RAILWAYS RENDERING ---
-    let railSubLayers = {
-      active: L.layerGroup().addTo(layerGroupRailways),
-      mod: L.layerGroup().addTo(layerGroupRailways),
-      lk622: L.layerGroup().addTo(layerGroupRailways),
-      mainlines: L.layerGroup().addTo(layerGroupRailways)
-    };
-
-    function renderRailways() {
-      if (!window.RAILWAYS_DATA) return;
+    // 5. RENDEROWANIE LINII KOLEJOWYCH Z RAILWAYS_DATA
+    if (window.RAILWAYS_DATA) {
       const d = window.RAILWAYS_DATA;
-
-      // LK 104 Active (Nowy Sącz - Marcinkowice)
       if (d.lk104_active) {
-        L.geoJSON(d.lk104_active, {
-          style: { color: '#10b981', weight: 4.5, opacity: 0.95 }
-        }).bindPopup('<b>LK 104: Odcinek Czynny (Nowy Sącz - Marcinkowice)</b><br>Ruch pasażerski POLREGIO wznowiony!').addTo(railSubLayers.active);
+        d.lk104_active.forEach(item => {
+          L.polyline(item.coords, { color: '#10b981', weight: 4.5, opacity: 0.95 })
+            .bindPopup("<b>LK 104 Czynna (Nowy Sącz – Marcinkowice)</b><br>Prędkość: do 120 km/h<br>Pociągi POLREGIO kursują od 2025/2026 r.!")
+            .addTo(layerLK104Active);
+        });
       }
-
-      // LK 104 Under Modernization (Marcinkowice - Limanowa)
       if (d.lk104_mod) {
-        L.geoJSON(d.lk104_mod, {
-          style: { color: '#f59e0b', weight: 4.5, dashArray: '6, 6', opacity: 0.95 }
-        }).bindPopup('<b>LK 104 w Modernizacji (Marcinkowice - Limanowa)</b><br>Nowy tor, estakady, peron Chomranice km 59+408. Otwarcie 2026/2027.').addTo(railSubLayers.mod);
+        d.lk104_mod.forEach(item => {
+          L.polyline(item.coords, { color: '#f59e0b', weight: 4.5, opacity: 0.95, dashArray: '6, 6' })
+            .bindPopup("<b>LK 104 w Modernizacji (Marcinkowice – Limanowa)</b><br>W tym stacja Chomranice, estakady i tunele.<br>Termin oddania: 2026/2027 r.")
+            .addTo(layerLK104Mod);
+        });
       }
-
-      // LK 622 New Corridor (Podłęże - Tymbark)
       if (d.lk622) {
-        L.geoJSON(d.lk622, {
-          style: { color: '#c084fc', weight: 5, opacity: 0.9 }
-        }).bindPopup('<b>Nowa Linia LK 622 (Podłęże - Tymbark)</b><br>Prędkość 160-200 km/h, tunel T13 (3.86 km). Czas do Krakowa ~50 min!').addTo(railSubLayers.lk622);
+        d.lk622.forEach(item => {
+          L.polyline(item.coords, { color: '#a855f7', weight: 5, opacity: 0.95 })
+            .bindPopup("<b>Nowa Linia LK 622 (Podłęże – Szczyrzyc – Tymbark)</b><br>Prędkość: 160–200 km/h<br>Tunel T13 (3,86 km pod Małą Górą). Czas do Krakowa ~50 min!")
+            .addTo(layerLK622);
+        });
       }
-
-      // Mainlines
       if (d.mainlines) {
-        L.geoJSON(d.mainlines, {
-          style: { color: '#38bdf8', weight: 2.5, opacity: 0.75 }
-        }).bindPopup('Główna Magistrala Kolejowa (Kraków - Tarnów - Nowy Sącz)').addTo(railSubLayers.mainlines);
+        d.mainlines.forEach(item => {
+          L.polyline(item.coords, { color: '#64748b', weight: 2.5, opacity: 0.7 }).addTo(layerMainlines);
+        });
       }
     }
-    renderRailways();
 
-    // --- GOLDEN ZONE POLYGON (Zawadka - Chomranice Ridge) ---
-    const goldenZoneCoords = [
-      [49.712, 20.612],
-      [49.705, 20.638],
-      [49.682, 20.630],
-      [49.680, 20.602],
-      [49.698, 20.598]
-    ];
-    L.polygon(goldenZoneCoords, {
-      color: '#f59e0b',
-      fillColor: '#f59e0b',
-      fillOpacity: 0.12,
-      dashArray: '4, 4',
-      weight: 2
-    }).bindPopup('<b>⭐ Złoty Pas: Chomranice – Zawadka (TOP 1 Rekomendacja)</b><br>• 1,5–2,5 km do stacji kolejowej (3 min)<br>• ~8,2 km do rodziców w Łososinie (100% ominięcie DK 75)<br>• Stabilne piaskowce magurskie, zero osuwisk!').addTo(layerGroupSpecial);
+    // 6. KONTROLKA WARSTW W LEWYM GÓRNYM ROGU (NATYWNY LEAFLET – ZAWSZE DZIAŁA)
+    const baseMaps = {
+      "🗺️ Mapa Drogowa (Esri Street)": esriStreet,
+      "🛰️ Satelitarna Ortofotomapa (Esri)": esriSatellite,
+      "⛰️ Topograficzna z Poziomicami (Esri Topo)": esriTopo,
+      "🌲 Turystyczna Górska (OpenTopo)": openTopo
+    };
+    const overlayMaps = {
+      "🟢 LK 104 Czynna (Nowy Sącz – Marcinkowice)": layerLK104Active,
+      "🟠 LK 104 w Modernizacji (Marcinkowice – Limanowa)": layerLK104Mod,
+      "🟣 Nowa Linia LK 622 (Podłęże – Tymbark)": layerLK622,
+      "⚪ Główne Linie (Kraków – Tarnów – Sącz)": layerMainlines,
+      "⭐ Złoty Pas Działkowy (Chomranice – Zawadka)": layerSpecialZones,
+      "📍 Moja Baza Miejsc & Działek": layerUserPoints
+    };
+    L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topleft' }).addTo(map);
 
-    // --- DEFAULT PRE-POPULATED LIFE HUB LOCATIONS ---
-    const DEFAULT_POINTS = [
-      {
-        id: 'home-emil-375',
-        name: 'Dom Rodzinny Emila (Łososina 375)',
-        category: 'family',
-        desc: 'Dom rodzinny na wierzchowinie w Równi. Adres: Łososina Dolna 375. Punkt odniesienia dla logistyki i dojazdu.',
-        lat: 49.7588975,
-        lng: 20.6328272,
-        color: '#f43f5e',
-        icon: 'home',
-        isDefault: true
-      },
-      {
-        id: 'home-dziadkowie-95',
-        name: 'Dom Dziadków (Łososina 95)',
-        category: 'family',
-        desc: 'Dom dziadków w Łososinie Dolnej 95. Sąsiednia działka na grzbiecie Równi.',
-        lat: 49.7583815,
-        lng: 20.6330076,
-        color: '#8b5cf6',
-        icon: 'heart',
-        isDefault: true
-      },
-      {
-        id: 'shop-mama-80',
-        name: 'Kwiaciarnia Mamy (Łososina 80)',
-        category: 'family',
-        desc: 'Kwiaciarnia mojej mamy pod adresem Łososina Dolna 80 (okolice centrum / Stara Plebania).',
-        lat: 49.7408147,
-        lng: 20.6221136,
-        color: '#ec4899',
-        icon: 'flower',
-        isDefault: true
-      },
-      {
-        id: 'station-chomranice',
-        name: 'Nowa Stacja Chomranice (km 59+408)',
-        category: 'station',
-        desc: 'Nowy przystanek pasażerski LK 104 z parkingiem Park&Ride. Czas do Krakowa ~50 min, do Nowego Sącza ~10 min.',
-        lat: 49.6912,
-        lng: 20.6085,
-        color: '#f59e0b',
-        icon: 'train',
-        isDefault: true
-      },
-      {
-        id: 'station-marcinkowice',
-        name: 'Stacja Marcinkowice (km 65+100)',
-        category: 'station',
-        desc: 'Czynna stacja kolejowa LK 104. Kursują pociągi Polregio do Nowego Sącza.',
-        lat: 49.6642,
-        lng: 20.6385,
-        color: '#10b981',
-        icon: 'train',
-        isDefault: true
-      },
-      {
-        id: 'recom-plot-zawadka',
-        name: 'Wzorcowy Rejon Działki (Zawadka / Chomranice)',
-        category: 'plot',
-        desc: 'Top rekomendacja pod budowę domu. 2.1 km do stacji, 8 km do rodziców lokalną drogą. Stok południowo-zachodni.',
-        lat: 49.6985,
-        lng: 20.6180,
-        color: '#10b981',
-        icon: 'sparkles',
-        isDefault: true
-      }
-    ];
-
-    // --- LOCAL STORAGE DATA ENGINE ---
-    let userPoints = [];
-    function loadPoints() {
-      const stored = localStorage.getItem('user_geo_points_v1');
-      if (stored) {
-        try {
-          userPoints = JSON.parse(stored);
-        } catch(e) {
-          userPoints = [...DEFAULT_POINTS];
-        }
-      } else {
-        userPoints = [...DEFAULT_POINTS];
-        savePoints();
-      }
-    }
-    function savePoints() {
-      localStorage.setItem('user_geo_points_v1', JSON.stringify(userPoints));
-      updatePointsCountBadge();
-    }
-    loadPoints();
-
-    // --- CUSTOM SVG ICON GENERATOR ---
-    function createCustomSvgIcon(color, glyph) {
-      const svg = `
-        <div style="position: relative; width: 34px; height: 42px;">
-          <svg viewBox="0 0 34 42" width="34" height="42" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));">
-            <path d="M17 0C7.61116 0 0 7.61116 0 17C0 27.5 17 42 17 42C17 42 34 27.5 34 17C34 7.61116 26.3888 0 17 0Z" fill="${color}"/>
-            <circle cx="17" cy="17" r="13" fill="#0f172a"/>
-          </svg>
-          <div style="position: absolute; top: 6px; left: 0; width: 34px; text-align: center; font-size: 14px;">${glyph}</div>
-        </div>
-      `;
+    // 7. PRECYZYJNE ZNACZNIKI RODZINNE I INFRASTRUKTURY
+    function createIconDiv(emoji, bgColor, borderColor) {
       return L.divIcon({
-        className: 'custom-pin-icon',
-        html: svg,
-        iconSize: [34, 42],
-        iconAnchor: [17, 42],
-        popupAnchor: [0, -38]
+        html: `<div style="background:${bgColor}; color:white; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; border:2.5px solid ${borderColor || 'white'}; box-shadow:0 3px 10px rgba(0,0,0,0.6);">${emoji}</div>`,
+        className: '',
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
       });
     }
 
-    const GLYPH_MAP = {
-      family: '👨‍👩‍👧',
-      plot: '🏡',
-      friends: '🤝',
-      neighbors: '🏘️',
-      bess: '⚡',
-      note: '📌',
-      station: '🚉',
-      other: '📍'
-    };
+    // Dom Rodzinny Emila (Łososina 375)
+    const homeMarker = L.marker(homeEmilCoords, { icon: createIconDiv('🏡', '#ef4444', '#fca5a5') }).addTo(map).bindPopup(`
+      <div class="custom-popup">
+        <h4 style="color:#ef4444;">🏡 Dom Rodzinny Emila (Łososina Dolna 375)</h4>
+        <p><strong>Współrzędne:</strong> 49.75890° N, 20.63283° E</p>
+        <p><strong>Lokalizacja:</strong> Równia – widokowy grzbiet, ojcowizna.</p>
+        <p><strong>Dojazd do stacji Chomranice:</strong> ~11,8 km (~13 min autem lokalną drogą wierzchowinową omijającą DK 75!).</p>
+      </div>
+    `);
 
-    // --- RENDER MARKERS ON MAP ---
-    let currentFilterCat = 'all';
-    let searchQuery = '';
+    // Dom Dziadków (Łososina 95)
+    const dziadkowieMarker = L.marker(dziadkowieCoords, { icon: createIconDiv('👴', '#8b5cf6', '#ddd6fe') }).addTo(map).bindPopup(`
+      <div class="custom-popup">
+        <h4 style="color:#a78bfa;">👴 Dom Dziadków (Łososina Dolna 95)</h4>
+        <p><strong>Współrzędne:</strong> 49.75838° N, 20.63301° E</p>
+        <p>Sąsiednia posesja na grzbiecie Równi (~57 m na południe od domu rodzinnego).</p>
+      </div>
+    `);
 
-    function renderPointsMarkers() {
-      layerGroupPoints.clearLayers();
+    // Kwiaciarnia Mamy (Łososina 80)
+    const mamaMarker = L.marker(mamaCoords, { icon: createIconDiv('🌸', '#ec4899', '#fbcfe8') }).addTo(map).bindPopup(`
+      <div class="custom-popup">
+        <h4 style="color:#f472b6;">🌸 Kwiaciarnia Mamy (Łososina Dolna 80)</h4>
+        <p><strong>Współrzędne:</strong> 49.74081° N, 20.62211° E</p>
+        <p>Centrum Łososiny Dolnej (rejon Starej Plebanii). Punkt logistyczny w dolinie.</p>
+      </div>
+    `);
 
-      userPoints.forEach(p => {
-        // Filter check
-        if (currentFilterCat !== 'all' && p.category !== currentFilterCat) return;
-        if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase()) && !p.desc.toLowerCase().includes(searchQuery.toLowerCase())) return;
+    // Nowy Przystanek Chomranice
+    const chomraniceMarker = L.marker(chomraniceCoords, { icon: createIconDiv('🌟', '#f59e0b', '#fef08a') }).addTo(map).bindPopup(`
+      <div class="custom-popup">
+        <h4 style="color:#fbbf24;">🌟 Nowy Przystanek Osobowy CHOMRANICE</h4>
+        <p><strong>Lokalizacja:</strong> LK 104, km 59+408 (Odcinek D, Gmina Chełmiec)</p>
+        <p><strong style="color:#34d399;">KLUCZOWY PUNKT DLA TWOJEGO SMART DOMU:</strong></p>
+        <ul>
+          <li>Czas do Krakowa Głównego: <strong>~50–52 min</strong> (po 2030 r.)</li>
+          <li>Czas do Nowego Sącza: <strong>~10 min</strong></li>
+          <li>Nowoczesny peron, duży parking Park&Ride</li>
+        </ul>
+      </div>
+    `);
 
-        const glyph = GLYPH_MAP[p.category] || '📍';
-        const icon = createCustomSvgIcon(p.color || '#38bdf8', glyph);
+    // Stacja Marcinkowice
+    const marcinkowiceMarker = L.marker(marcinkowiceCoords, { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup(`
+      <div class="custom-popup">
+        <h4>🚉 Stacja Marcinkowice (LK 104)</h4>
+        <p><strong>Status:</strong> Zmodernizowana, ruch pociągów POLREGIO wznowiony!</p>
+        <p>14 par pociągów na dobę do Nowego Sącza.</p>
+      </div>
+    `);
 
-        const m = L.marker([p.lat, p.lng], {
-          icon: icon,
-          draggable: !p.isDefault // Default pins locked, custom can be dragged
-        });
+    // Pozostałe kluczowe stacje i obiekty
+    L.marker([49.6800, 20.5250], { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup("<b>🚉 Stacja Męcina (LK 104)</b><br>Wylot tunelu T13 (3,86 km). Czas do Krakowa: ~45 min.");
+    L.marker([49.6880, 20.4850], { icon: createIconDiv('🚇', '#7c3aed', '#fef08a') }).addTo(map).bindPopup("<b>🚇 Tunel T13 (3,86 km)</b><br>Najdłuższy tunel w Małopolsce! Przebity pod Pisarzową i Męciną.");
+    L.marker([49.7080, 20.4250], { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup("<b>🚉 Stacja Limanowa</b><br>Węzeł komunikacyjny Beskidu Wyspowego.");
+    L.marker([49.7350, 20.3150], { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup("<b>🚉 Stacja Tymbark</b><br>Wpięcie nowej magistrali LK 622 w zmodernizowaną LK 104.");
+    L.marker([49.8050, 20.1850], { icon: createIconDiv('🟣', '#7c3aed', 'white') }).addTo(map).bindPopup("<b>🚉 Nowa Stacja Szczyrzyc (LK 622)</b>");
+    L.marker([49.9050, 20.2050], { icon: createIconDiv('🟣', '#7c3aed', 'white') }).addTo(map).bindPopup("<b>🚉 Nowa Stacja Gdów (LK 622)</b>");
+    L.marker([50.0050, 20.1750], { icon: createIconDiv('🟣', '#7c3aed', 'white') }).addTo(map).bindPopup("<b>🚉 Węzeł Podłęże R401</b><br>Wpięcie w magistralę do Krakowa.");
+    L.marker([50.0680, 19.9480], { icon: createIconDiv('🏰', '#d97706', 'white') }).addTo(map).bindPopup("<b>🏰 Kraków Główny</b>");
+    L.marker([49.6250, 20.7000], { icon: createIconDiv('🚉', '#0284c7', 'white') }).addTo(map).bindPopup("<b>🚉 Nowy Sącz Główny</b>");
 
-        // Drag handler to update coordinates
-        m.on('dragend', function(e) {
-          const newPos = e.target.getLatLng();
-          p.lat = newPos.lat;
-          p.lng = newPos.lng;
-          savePoints();
-          renderPointsList();
-          inspectCoordinates(p.lat, p.lng, p.name);
-        });
+    // 8. ZŁOTY PAS DZIAŁKOWY (Chomranice – Zawadka)
+    L.polygon([
+      [49.6660, 20.5920],
+      [49.6890, 20.6020],
+      [49.6950, 20.6380],
+      [49.6680, 20.6300]
+    ], {
+      color: '#f59e0b',
+      fillColor: '#fbbf24',
+      fillOpacity: 0.20,
+      weight: 2.5,
+      dashArray: '5, 5'
+    }).addTo(layerSpecialZones).bindPopup(`
+      <div class="custom-popup">
+        <h4 style="color:#fbbf24;">🥇 Złoty Pas Działkowy: Chomranice – Zawadka</h4>
+        <p>• 1,5–2,5 km do nowego peronu Chomranice (3 min autem na Park&Ride)<br>
+        • ~11,8 km do rodziców w Łososinie 375 lokalną wierzchowiną (100% ominięcie DK 75)<br>
+        • Stabilne podłoże fliszu magurskiego, brak osuwisk, południowe stoki.</p>
+      </div>
+    `);
 
-        // Popup content
-        const popupHtml = `
-          <div class="p-2 text-xs space-y-1.5 min-w-[210px]">
-            <div class="font-bold text-white text-sm flex items-center space-x-1.5">
-              <span>${glyph}</span>
-              <span>${p.name}</span>
-            </div>
-            <p class="text-slate-300 text-[11px] leading-relaxed">${p.desc || 'Brak dodatkowego opisu.'}</p>
-            <div class="text-[10px] text-sky-400 font-mono">${p.lat.toFixed(5)}° N, ${p.lng.toFixed(5)}° E</div>
-            <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
-              <button onclick="window.inspectCoordinates(${p.lat}, ${p.lng}, '${p.name.replace(/'/g, "\\'")}')" class="px-2 py-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded text-[10px]">Zbadaj działkę</button>
-              <button onclick="window.openEditModal('${p.id}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-[10px]">Edytuj</button>
-            </div>
-          </div>
-        `;
-        m.bindPopup(popupHtml);
+    // Bufor 1,2 km od Chomranic
+    L.circle(chomraniceCoords, {
+      radius: 1200,
+      color: '#10b981',
+      fillColor: '#34d47a',
+      fillOpacity: 0.08,
+      weight: 1.5,
+      dashArray: '6, 6'
+    }).addTo(layerSpecialZones);
 
-        m.on('click', () => {
-          inspectCoordinates(p.lat, p.lng, p.name);
-        });
+    // Bezkorkowa trasa wierzchowinowa
+    L.polyline([
+      chomraniceCoords,
+      [49.6780, 20.6180],
+      [49.6910, 20.6260],
+      [49.7120, 20.6340],
+      [49.7380, 20.6370],
+      homeEmilCoords
+    ], {
+      color: '#38bdf8',
+      weight: 3.5,
+      opacity: 0.85,
+      dashArray: '8, 8'
+    }).addTo(layerSpecialZones).bindPopup(`
+      <div class="custom-popup">
+        <h4>🚗 Bezkorkowa Trasa: Chomranice ↔ Łososina 375</h4>
+        <p>Dystans: <strong>~11,8 km</strong> | Czas: <strong>~13 minut</strong></p>
+        <p>Ominięcie zatorów weekendowych na DK 75 nad Jeziorem Rożnowskim i Górą Just!</p>
+      </div>
+    `);
 
-        m.addTo(layerGroupPoints);
-      });
+    // 9. INTELIGENTNY SKANER DZIAŁKI (KLIK W MAPĘ)
+    let scoutLineHome = null;
+    let scoutLineStation = null;
+    let scoutMarker = null;
+    let lastScoutCoords = null;
 
-      renderPointsList();
-    }
-
-    // --- RENDER POINTS IN TAB 2 LIST ---
-    function renderPointsList() {
-      const container = document.getElementById('points-list');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const filtered = userPoints.filter(p => {
-        if (currentFilterCat !== 'all' && p.category !== currentFilterCat) return false;
-        if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase()) && !p.desc.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Brak zapisanych miejsc w tej kategorii.</div>';
-        return;
-      }
-
-      filtered.forEach(p => {
-        const glyph = GLYPH_MAP[p.category] || '📍';
-        const dHome = calcDistance(p.lat, p.lng, COORDS_HOME.lat, COORDS_HOME.lng).toFixed(1);
-        const dStation = calcDistance(p.lat, p.lng, COORDS_CHOMRANICE.lat, COORDS_CHOMRANICE.lng).toFixed(1);
-
-        const card = document.createElement('div');
-        card.className = 'p-3 bg-slate-800/60 hover:bg-slate-800 rounded-xl border border-slate-700/60 cursor-pointer transition active:scale-[0.99] space-y-1.5';
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="font-bold text-white text-xs flex items-center space-x-1.5 truncate max-w-[220px]">
-              <span>${glyph}</span>
-              <span class="truncate">${p.name}</span>
-            </div>
-            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${p.color};"></span>
-          </div>
-          <p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">${p.desc}</p>
-          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-700/40">
-            <span>Stacja: <strong class="text-amber-400">${dStation} km</strong></span>
-            <span>Rodzice: <strong class="text-rose-400">${dHome} km</strong></span>
-            <button class="text-sky-400 hover:underline font-semibold" onclick="event.stopPropagation(); window.openEditModal('${p.id}')">Edytuj</button>
-          </div>
-        `;
-        card.onclick = () => {
-          map.setView([p.lat, p.lng], 16);
-          inspectCoordinates(p.lat, p.lng, p.name);
-          switchTab('scout');
-        };
-        container.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    function updatePointsCountBadge() {
-      const badge = document.getElementById('points-count');
-      if (badge) badge.innerText = userPoints.length;
-    }
-    updatePointsCountBadge();
-
-    // --- SMART PLOT SCOUT INSPECTION ENGINE ---
-    window.inspectCoordinates = function(lat, lng, label) {
-      const dStation = calcDistance(lat, lng, COORDS_CHOMRANICE.lat, COORDS_CHOMRANICE.lng);
-      const dHome = calcDistance(lat, lng, COORDS_HOME.lat, COORDS_HOME.lng);
-
-      document.getElementById('scout-title').innerText = label || 'Badana Parcela';
-      document.getElementById('scout-badge').innerText = (dStation <= 2.5) ? '⭐ W strefie stacji' : 'Obszar podmiejski';
-      document.getElementById('scout-coords').innerText = `Współrzędne: ${lat.toFixed(5)}° N, ${lng.toFixed(5)}° E`;
-
-      // Distances
-      document.getElementById('scout-dist-station').innerText = `${dStation.toFixed(1)} km`;
-      const walkMin = Math.round(dStation * 12);
-      const bikeMin = Math.round(dStation * 3.5);
-      const carMin = Math.round(dStation * 1.5 + 1);
-      document.getElementById('scout-time-station').innerText = `Chomranice: ~${carMin} min autem / ${bikeMin} min rowerem`;
-
-      document.getElementById('scout-dist-parents').innerText = `${dHome.toFixed(1)} km`;
-      const homeCarMin = Math.round(dHome * 1.6 + 1);
-      document.getElementById('scout-time-parents').innerText = `Łososina 375: ~${homeCarMin} min (lokalną wierzchowiną)`;
-
-      // Acoustic Zone Assessment
-      const acousticBox = document.getElementById('scout-acoustic-box');
-      const acousticTitle = document.getElementById('scout-acoustic-title');
-      const acousticDesc = document.getElementById('scout-acoustic-desc');
-
-      if (dStation < 0.4) {
-        acousticBox.className = 'p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl';
-        acousticTitle.className = 'font-bold text-rose-400 flex items-center space-x-1.5';
-        acousticTitle.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4"></i><span>Bezpośrednia strefa akustyczna (&lt;400 m)</span>';
-        acousticDesc.innerText = 'Działka bardzo blisko toru. Zalecane okna 3-szybowe o podwyższonym Rw i naturalna bariera zieleni.';
-      } else if (dStation <= 2.0) {
-        acousticBox.className = 'p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl';
-        acousticTitle.className = 'font-bold text-emerald-400 flex items-center space-x-1.5';
-        acousticTitle.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i><span>Złoty Pas Ciszy i Dostępności (0.4 – 2.0 km)</span>';
-        acousticDesc.innerText = 'Perfekcyjny kompromis: całkowita cisza akustyczna w ogrodzie, a zarazem 3–5 minut do pociągu do Krakowa!';
-      } else {
-        acousticBox.className = 'p-3 bg-sky-500/10 border border-sky-500/30 rounded-xl';
-        acousticTitle.className = 'font-bold text-sky-400 flex items-center space-x-1.5';
-        acousticTitle.innerHTML = '<i data-lucide="info" class="w-4 h-4"></i><span>Poza zasięgiem hałasu (&gt;2.0 km)</span>';
-        acousticDesc.innerText = 'Spokojna strefa wiejska/górzysta. Dojazd do stacji wymaga roweru elektrycznego lub auta (Park&Ride).';
-      }
-
-      // Geoportal and SOPO Links
-      document.getElementById('btn-geoportal').href = `https://mapy.geoportal.gov.pl/imap/Imgp_2.html?locale=pl&gui=new&session=&zoom=17&xy=${lng},${lat}`;
-      document.getElementById('btn-sopo').href = `https://osuwiska.pgi.gov.pl/`;
-
-      // Update Active Scout Marker on Map
-      if (activeScoutMarker) map.removeLayer(activeScoutMarker);
-      activeScoutMarker = L.circleMarker([lat, lng], {
-        radius: 9,
-        color: '#38bdf8',
-        fillColor: '#38bdf8',
-        fillOpacity: 0.8,
-        weight: 3
-      }).addTo(map);
-
-      lucide.createIcons();
-    };
-
-    // Initial inspection of Home
-    inspectCoordinates(COORDS_HOME.lat, COORDS_HOME.lng, COORDS_HOME.name);
-
-    // --- MAP CLICK HANDLER (Add Point / Inspect Plot) ---
     map.on('click', function(e) {
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
-
-      if (clickToAddMode) {
-        clickToAddMode = false;
-        document.getElementById('click-helper-toast').classList.add('hidden');
-        window.openAddModal(lat, lng);
+      const clickLatLng = L.latLng(lat, lng);
+      lastScoutCoords = { lat, lng };
+      
+      const distToChomranice = Math.round(L.latLng(chomraniceCoords).distanceTo(clickLatLng));
+      const distToMarcinkowice = Math.round(L.latLng(marcinkowiceCoords).distanceTo(clickLatLng));
+      const distToHome = Math.round(L.latLng(homeEmilCoords).distanceTo(clickLatLng));
+      
+      const nearestDist = Math.min(distToChomranice, distToMarcinkowice);
+      const nearestStationName = distToChomranice <= distToMarcinkowice ? "Chomranice" : "Marcinkowice";
+      
+      const walkMin = Math.round(nearestDist / 80);
+      const bikeMin = Math.round(nearestDist / 250);
+      const carMinStation = Math.max(2, Math.round(nearestDist / 600));
+      const carMinHome = Math.max(3, Math.round((distToHome * 1.3) / 600));
+      
+      let acousticRating = "";
+      if (nearestDist < 350) {
+        acousticRating = '<span class="badge-rating rating-noisy">⚠️ < 350m: Hałas i drgania</span>';
+      } else if (nearestDist <= 1600) {
+        acousticRating = '<span class="badge-rating rating-ideal">🌟 500m-1.6km: STREFA IDEALNA (Cisza + Szybki dojazd)</span>';
       } else {
-        inspectCoordinates(lat, lng, 'Wybrana Parcela w Terenie');
+        acousticRating = '<span class="badge-rating rating-good">🚗 > 1.6km: Wymaga auta / e-bike</span>';
       }
+
+      const geoportalUrl = `https://mapy.geoportal.gov.pl/imap/Imgp_2.html?locale=pl&gui=new&session=&zoom=17&xy=${lng},${lat}`;
+      const sopoUrl = `https://osuwiska.pgi.gov.pl/`;
+
+      if (scoutLineHome) map.removeLayer(scoutLineHome);
+      if (scoutLineStation) map.removeLayer(scoutLineStation);
+      if (scoutMarker) map.removeLayer(scoutMarker);
+
+      scoutLineStation = L.polyline([L.latLng(chomraniceCoords), clickLatLng], {
+        color: '#f59e0b',
+        weight: 3,
+        dashArray: '5, 5'
+      }).addTo(map);
+
+      scoutLineHome = L.polyline([L.latLng(homeEmilCoords), clickLatLng], {
+        color: '#ef4444',
+        weight: 2.5,
+        dashArray: '4, 4'
+      }).addTo(map);
+
+      scoutMarker = L.circleMarker(clickLatLng, {
+        radius: 8,
+        color: '#38bdf8',
+        fillColor: '#7dd3fc',
+        fillOpacity: 0.95
+      }).addTo(map);
+
+      const infoBox = document.getElementById('plot-analysis-box');
+      infoBox.style.display = 'block';
+      infoBox.innerHTML = `
+        <div class="analysis-header">
+          <span>📍 Parcela (${lat.toFixed(5)}°N, ${lng.toFixed(5)}°E)</span>
+          ${acousticRating}
+        </div>
+        <div style="margin: 6px 0;">
+          🚉 Do stacji <strong>${nearestStationName}</strong>: <strong>${(nearestDist/1000).toFixed(2)} km</strong><br>
+          <span style="color:#94a3b8;">🚶 Spacer: <strong>~${walkMin} min</strong> | 🚲 Rower: <strong>~${bikeMin} min</strong> | 🚗 Auto: <strong>~${carMinStation} min</strong></span>
+        </div>
+        <div style="margin: 6px 0;">
+          🏡 Do rodziców w <strong>Łososinie 375</strong>: <strong>${(distToHome/1000).toFixed(2)} km</strong><br>
+          <span style="color:#94a3b8;">🚗 Auto lokalną wierzchowiną: <strong>~${carMinHome} min</strong></span>
+        </div>
+        <div style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
+          <a href="${geoportalUrl}" target="_blank" class="btn-action" style="font-size:0.72rem; padding:5px 8px; background:#0284c7;">
+            🗺️ Sprawdź Działkę w Geoportalu
+          </a>
+          <a href="${sopoUrl}" target="_blank" class="btn-action btn-slate" style="font-size:0.72rem; padding:5px 8px;">
+            🛡️ Osuwiska SOPO
+          </a>
+          <button onclick="saveCurrentScoutAsPlot()" class="btn-action btn-emerald" style="font-size:0.72rem; padding:5px 8px;">
+            💾 Zapisz jako moją działkę
+          </button>
+        </div>
+      `;
     });
 
-    // --- TAB SWITCHING LOGIC ---
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.getAttribute('data-tab') === tabName) {
-          btn.className = 'tab-btn flex-1 py-1.5 flex flex-col items-center space-y-1 text-sky-400 border-b-2 border-sky-400 transition';
-        } else {
-          btn.className = 'tab-btn flex-1 py-1.5 flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition';
-        }
-      });
+    // 10. TWOJA BAZA MIEJSC (PERSONAL GIS & LIFE HUB ENGINE)
+    const DEFAULT_USER_POINTS = [
+      {
+        id: 'home-375',
+        name: 'Dom Rodzinny Emila (Łososina 375)',
+        category: 'family',
+        lat: 49.7588975,
+        lng: 20.6328272,
+        desc: 'Dom rodzinny na wierzchowinie Równi. Baza logistyczna.',
+        isDefault: true
+      },
+      {
+        id: 'dziadkowie-95',
+        name: 'Dom Dziadków (Łososina 95)',
+        category: 'family',
+        lat: 49.7583815,
+        lng: 20.6330076,
+        desc: 'Dom dziadków w sąsiedztwie domu rodzinnego.',
+        isDefault: true
+      },
+      {
+        id: 'mama-80',
+        name: 'Kwiaciarnia Mamy (Łososina 80)',
+        category: 'family',
+        lat: 49.7408147,
+        lng: 20.6221136,
+        desc: 'Kwiaciarnia w centrum Łososiny Dolnej (Stara Plebania).',
+        isDefault: true
+      },
+      {
+        id: 'plot-zawadka-recom',
+        name: 'Przykładowa Działka Zawadka (Widok Tatry)',
+        category: 'plot',
+        lat: 49.6985,
+        lng: 20.6180,
+        desc: 'Złoty pas: 2,1 km do peronu Chomranice, stok południowy, brak osuwisk.',
+        isDefault: false
+      }
+    ];
 
-      document.getElementById('tab-scout-content').classList.toggle('hidden', tabName !== 'scout');
-      document.getElementById('tab-points-content').classList.toggle('hidden', tabName !== 'points');
-      document.getElementById('tab-railway-content').classList.toggle('hidden', tabName !== 'railway');
-      document.getElementById('tab-vision-content').classList.toggle('hidden', tabName !== 'vision');
-      lucide.createIcons();
+    let userPoints = [];
+    let currentFilter = 'all';
+    let markersMap = {};
+
+    function loadUserPoints() {
+      const saved = localStorage.getItem('emil_life_hub_points_v2');
+      if (saved) {
+        try {
+          userPoints = JSON.parse(saved);
+        } catch(e) {
+          userPoints = [...DEFAULT_USER_POINTS];
+        }
+      } else {
+        userPoints = [...DEFAULT_USER_POINTS];
+        saveUserPointsToStorage();
+      }
+      renderUserPoints();
     }
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
-    });
+    function saveUserPointsToStorage() {
+      localStorage.setItem('emil_life_hub_points_v2', JSON.stringify(userPoints));
+    }
 
-    // --- LAYER SWITCHER LOGIC ---
-    document.getElementById('toggle-layers-btn').addEventListener('click', () => {
-      document.getElementById('layer-modal').classList.toggle('hidden');
-    });
-    document.getElementById('close-layers-btn').addEventListener('click', () => {
-      document.getElementById('layer-modal').classList.add('hidden');
-    });
+    function getCategoryEmoji(cat) {
+      switch(cat) {
+        case 'plot': return '🏡';
+        case 'family': return '👨‍👩‍👧';
+        case 'friends': return '🤝';
+        case 'neighbors': return '🏘️';
+        case 'bess': return '⚡';
+        case 'note': return '📌';
+        default: return '📍';
+      }
+    }
 
-    document.querySelectorAll('input[name="basemap"]').forEach(input => {
-      input.addEventListener('change', (e) => {
-        const val = e.target.value;
-        Object.keys(tileLayers).forEach(k => map.removeLayer(tileLayers[k]));
-        tileLayers[val].addTo(map);
+    function getCategoryColor(cat) {
+      switch(cat) {
+        case 'plot': return '#10b981';
+        case 'family': return '#8b5cf6';
+        case 'friends': return '#f59e0b';
+        case 'neighbors': return '#0284c7';
+        case 'bess': return '#06b6d4';
+        case 'note': return '#ec4899';
+        default: return '#64748b';
+      }
+    }
+
+    function renderUserPoints() {
+      layerUserPoints.clearLayers();
+      markersMap = {};
+      const listContainer = document.getElementById('user-points-container');
+      listContainer.innerHTML = '';
+
+      const filtered = userPoints.filter(p => currentFilter === 'all' || p.category === currentFilter);
+
+      filtered.forEach(p => {
+        const emoji = getCategoryEmoji(p.category);
+        const color = getCategoryColor(p.category);
+
+        // Marker na mapie
+        const m = L.marker([p.lat, p.lng], {
+          icon: createIconDiv(emoji, color, 'white'),
+          draggable: !p.isDefault
+        }).addTo(layerUserPoints);
+
+        m.bindPopup(`
+          <div class="custom-popup">
+            <h4 style="color:${color};">${emoji} ${p.name}</h4>
+            <p>${p.desc || 'Brak dodatkowego opisu.'}</p>
+            <p style="font-size:0.75rem; color:#94a3b8;">${p.lat.toFixed(5)}° N, ${p.lng.toFixed(5)}° E</p>
+            <div style="margin-top:6px; display:flex; gap:6px;">
+              <button onclick="editPointModal('${p.id}')" class="btn-action btn-slate" style="padding:3px 7px; font-size:0.7rem;">Edytuj</button>
+            </div>
+          </div>
+        `);
+
+        m.on('dragend', function(e) {
+          const pos = e.target.getLatLng();
+          p.lat = pos.lat;
+          p.lng = pos.lng;
+          saveUserPointsToStorage();
+          renderUserPoints();
+        });
+
+        markersMap[p.id] = m;
+
+        // Karta na liście w sidebarze
+        const card = document.createElement('div');
+        card.className = 'point-card';
+        card.innerHTML = `
+          <div class="point-info">
+            <div class="point-name">${emoji} ${p.name}</div>
+            <div class="point-desc">${p.desc || 'Brak opisu'}</div>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button onclick="event.stopPropagation(); focusPoint('${p.id}')" class="btn-action" style="padding:3px 6px; font-size:0.7rem;">Pokaż</button>
+            <button onclick="event.stopPropagation(); editPointModal('${p.id}')" class="btn-action btn-slate" style="padding:3px 6px; font-size:0.7rem;">Edytuj</button>
+          </div>
+        `;
+        card.onclick = () => focusPoint(p.id);
+        listContainer.appendChild(card);
       });
-    });
 
-    document.getElementById('check-lk104-active').addEventListener('change', (e) => {
-      if (e.target.checked) railSubLayers.active.addTo(layerGroupRailways);
-      else layerGroupRailways.removeLayer(railSubLayers.active);
-    });
-    document.getElementById('check-lk104-mod').addEventListener('change', (e) => {
-      if (e.target.checked) railSubLayers.mod.addTo(layerGroupRailways);
-      else layerGroupRailways.removeLayer(railSubLayers.mod);
-    });
-    document.getElementById('check-lk622').addEventListener('change', (e) => {
-      if (e.target.checked) railSubLayers.lk622.addTo(layerGroupRailways);
-      else layerGroupRailways.removeLayer(railSubLayers.lk622);
-    });
-    document.getElementById('check-mainlines').addEventListener('change', (e) => {
-      if (e.target.checked) railSubLayers.mainlines.addTo(layerGroupRailways);
-      else layerGroupRailways.removeLayer(railSubLayers.mainlines);
-    });
-
-    // --- QUICK NAVIGATION BUTTONS ---
-    document.getElementById('btn-quick-home').addEventListener('click', () => {
-      map.setView([COORDS_HOME.lat, COORDS_HOME.lng], 16);
-      inspectCoordinates(COORDS_HOME.lat, COORDS_HOME.lng, COORDS_HOME.name);
-      switchTab('scout');
-    });
-    document.getElementById('btn-station').addEventListener('click', () => {
-      map.setView([COORDS_CHOMRANICE.lat, COORDS_CHOMRANICE.lng], 16);
-      inspectCoordinates(COORDS_CHOMRANICE.lat, COORDS_CHOMRANICE.lng, COORDS_CHOMRANICE.name);
-      switchTab('scout');
-    });
-
-    // --- GPS REALTIME GEOLOCATION ---
-    let gpsWatchId = null;
-    document.getElementById('btn-gps').addEventListener('click', () => {
-      if (!navigator.geolocation) {
-        alert('Twoja przeglądarka nie wspiera geolokalizacji.');
-        return;
+      if (filtered.length === 0) {
+        listContainer.innerHTML = '<div style="color:#64748b; font-size:0.75rem; text-align:center; padding:10px;">Brak punktów w tej kategorii.</div>';
       }
-      const btn = document.getElementById('btn-gps');
-      btn.classList.add('animate-spin');
+    }
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          btn.classList.remove('animate-spin');
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
+    function filterCategory(cat, btn) {
+      currentFilter = cat;
+      document.querySelectorAll('.gis-pill').forEach(el => el.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderUserPoints();
+    }
 
-          if (gpsMarker) map.removeLayer(gpsMarker);
-          if (gpsAccuracyCircle) map.removeLayer(gpsAccuracyCircle);
-
-          const pulseIcon = L.divIcon({
-            className: 'gps-pulse-container',
-            html: '<div class="gps-marker-pulse"></div>',
-            iconSize: [18, 18],
-            iconAnchor: [9, 9]
-          });
-
-          gpsMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
-          gpsAccuracyCircle = L.circle([lat, lng], {
-            radius: accuracy,
-            color: '#38bdf8',
-            fillColor: '#38bdf8',
-            fillOpacity: 0.15,
-            weight: 1
-          }).addTo(map);
-
-          map.setView([lat, lng], 16);
-          inspectCoordinates(lat, lng, '📍 Twoja Bieżąca Lokalizacja');
-          switchTab('scout');
-        },
-        (err) => {
-          btn.classList.remove('animate-spin');
-          alert('Nie udało się pobrać pozycji GPS: ' + err.message);
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    });
-
-    // --- ADD POINT / SAVE ACTION ---
-    document.getElementById('btn-add-point-fab').addEventListener('click', () => {
-      clickToAddMode = true;
-      document.getElementById('click-helper-toast').classList.remove('hidden');
-    });
-    document.getElementById('cancel-click-add').addEventListener('click', () => {
-      clickToAddMode = false;
-      document.getElementById('click-helper-toast').classList.add('hidden');
-    });
-    document.getElementById('btn-add-point-manual').addEventListener('click', () => {
-      const center = map.getCenter();
-      window.openAddModal(center.lat, center.lng);
-    });
-    document.getElementById('btn-save-as-point').addEventListener('click', () => {
-      if (activeScoutMarker) {
-        const pos = activeScoutMarker.getLatLng();
-        window.openAddModal(pos.lat, pos.lng);
-      }
-    });
-
-    // --- MODAL DIALOG CONTROLLER ---
-    window.openAddModal = function(lat, lng) {
-      document.getElementById('modal-title').innerHTML = '<span>➕</span><span>Dodaj Nowy Punkt</span>';
-      document.getElementById('form-point-id').value = '';
-      document.getElementById('form-point-lat').value = lat;
-      document.getElementById('form-point-lng').value = lng;
-      document.getElementById('modal-coords-display').innerText = `${lat.toFixed(5)}° N, ${lng.toFixed(5)}° E`;
-      document.getElementById('form-point-name').value = '';
-      document.getElementById('form-point-desc').value = '';
-      document.getElementById('form-point-category').value = 'plot';
-      document.getElementById('btn-delete-point').classList.add('hidden');
-      document.getElementById('point-modal').classList.remove('hidden');
-    };
-
-    window.openEditModal = function(id) {
+    function focusPoint(id) {
       const p = userPoints.find(item => item.id === id);
       if (!p) return;
-      document.getElementById('modal-title').innerHTML = '<span>✏️</span><span>Edytuj Punkt</span>';
-      document.getElementById('form-point-id').value = p.id;
-      document.getElementById('form-point-lat').value = p.lat;
-      document.getElementById('form-point-lng').value = p.lng;
-      document.getElementById('modal-coords-display').innerText = `${p.lat.toFixed(5)}° N, ${p.lng.toFixed(5)}° E`;
-      document.getElementById('form-point-name').value = p.name;
-      document.getElementById('form-point-desc').value = p.desc || '';
-      document.getElementById('form-point-category').value = p.category || 'plot';
+      map.flyTo([p.lat, p.lng], 16, { duration: 1.2 });
+      if (markersMap[id]) markersMap[id].openPopup();
+      // Jeśli na telefonie, zamknij sidebar po kliknięciu
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+      }
+    }
 
-      // Set color radio
-      const colorRadio = document.querySelector(`input[name="point-color"][value="${p.color}"]`);
-      if (colorRadio) colorRadio.checked = true;
+    // Formularz dodawania / edycji punktu
+    function openAddPointModal(lat, lng, defaultName) {
+      document.getElementById('modal-point-title').innerHTML = '<span>➕ Dodaj Nowy Punkt</span><button onclick="closePointModal()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>';
+      document.getElementById('modal-point-id').value = '';
+      document.getElementById('modal-point-name').value = defaultName || '';
+      document.getElementById('modal-point-category').value = 'plot';
+      document.getElementById('modal-point-lat').value = (lat || map.getCenter().lat).toFixed(6);
+      document.getElementById('modal-point-lng').value = (lng || map.getCenter().lng).toFixed(6);
+      document.getElementById('modal-point-desc').value = '';
+      document.getElementById('btn-delete-point').classList.add('hidden');
+      document.getElementById('point-modal').classList.add('active');
+    }
 
-      // Show delete if not default
+    function saveCurrentScoutAsPlot() {
+      if (!lastScoutCoords) return;
+      openAddPointModal(lastScoutCoords.lat, lastScoutCoords.lng, 'Obserwowana Działka');
+    }
+
+    function editPointModal(id) {
+      const p = userPoints.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('modal-point-title').innerHTML = '<span>✏️ Edytuj Punkt</span><button onclick="closePointModal()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer;">✕</button>';
+      document.getElementById('modal-point-id').value = p.id;
+      document.getElementById('modal-point-name').value = p.name;
+      document.getElementById('modal-point-category').value = p.category || 'plot';
+      document.getElementById('modal-point-lat').value = p.lat.toFixed(6);
+      document.getElementById('modal-point-lng').value = p.lng.toFixed(6);
+      document.getElementById('modal-point-desc').value = p.desc || '';
       if (!p.isDefault) {
         document.getElementById('btn-delete-point').classList.remove('hidden');
       } else {
         document.getElementById('btn-delete-point').classList.add('hidden');
       }
-      document.getElementById('point-modal').classList.remove('hidden');
-    };
-
-    function closeModal() {
-      document.getElementById('point-modal').classList.add('hidden');
+      document.getElementById('point-modal').classList.add('active');
     }
-    document.getElementById('close-modal-btn').addEventListener('click', closeModal);
-    document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
 
-    // Form Submit (Save)
-    document.getElementById('point-form').addEventListener('submit', (e) => {
+    function closePointModal() {
+      document.getElementById('point-modal').classList.remove('active');
+    }
+
+    function savePointForm(e) {
       e.preventDefault();
-      const id = document.getElementById('form-point-id').value || ('user-point-' + Date.now());
-      const lat = parseFloat(document.getElementById('form-point-lat').value);
-      const lng = parseFloat(document.getElementById('form-point-lng').value);
-      const name = document.getElementById('form-point-name').value.trim();
-      const desc = document.getElementById('form-point-desc').value.trim();
-      const category = document.getElementById('form-point-category').value;
-      const color = document.querySelector('input[name="point-color"]:checked')?.value || '#38bdf8';
+      const id = document.getElementById('modal-point-id').value || ('pt_' + Date.now());
+      const name = document.getElementById('modal-point-name').value.trim();
+      const category = document.getElementById('modal-point-category').value;
+      const lat = parseFloat(document.getElementById('modal-point-lat').value);
+      const lng = parseFloat(document.getElementById('modal-point-lng').value);
+      const desc = document.getElementById('modal-point-desc').value.trim();
 
-      const existingIndex = userPoints.findIndex(p => p.id === id);
+      const existingIndex = userPoints.findIndex(item => item.id === id);
       const newObj = {
         id: id,
         name: name,
-        desc: desc,
         category: category,
         lat: lat,
         lng: lng,
-        color: color,
+        desc: desc,
         isDefault: existingIndex >= 0 ? userPoints[existingIndex].isDefault : false
       };
 
@@ -1215,65 +1257,43 @@
         userPoints.push(newObj);
       }
 
-      savePoints();
-      renderPointsMarkers();
-      closeModal();
-      inspectCoordinates(lat, lng, name);
-      switchTab('points');
-    });
+      saveUserPointsToStorage();
+      renderUserPoints();
+      closePointModal();
+      focusPoint(id);
+    }
 
-    // Delete Point
-    document.getElementById('btn-delete-point').addEventListener('click', () => {
-      const id = document.getElementById('form-point-id').value;
+    function deleteCurrentPoint() {
+      const id = document.getElementById('modal-point-id').value;
       if (!id) return;
       if (confirm('Czy na pewno chcesz usunąć ten punkt?')) {
-        userPoints = userPoints.filter(p => p.id !== id);
-        savePoints();
-        renderPointsMarkers();
-        closeModal();
+        userPoints = userPoints.filter(item => item.id !== id);
+        saveUserPointsToStorage();
+        renderUserPoints();
+        closePointModal();
       }
-    });
+    }
 
-    // --- FILTER PILLS IN TAB 2 ---
-    document.querySelectorAll('.filter-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-pill').forEach(b => {
-          b.className = 'filter-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap';
-        });
-        btn.className = 'filter-pill px-2.5 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold whitespace-nowrap';
-        currentFilterCat = btn.getAttribute('data-cat');
-        renderPointsMarkers();
-      });
-    });
+    // Eksport i import JSON
+    function exportPointsJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userPoints, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `emil_life_hub_punkty_${new Date().toISOString().slice(0,10)}.json`);
+      dlAnchor.click();
+    }
 
-    // Search input
-    document.getElementById('search-points').addEventListener('input', (e) => {
-      searchQuery = e.target.value;
-      renderPointsMarkers();
-    });
-
-    // --- BACKUP & RESTORE JSON ---
-    document.getElementById('btn-export-json').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(userPoints, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `malopolska_life_hub_backup_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-
-    document.getElementById('import-json-file').addEventListener('change', (e) => {
+    function importPointsJSON(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (evt) => {
+      reader.onload = function(evt) {
         try {
           const imported = JSON.parse(evt.target.result);
           if (Array.isArray(imported)) {
             userPoints = imported;
-            savePoints();
-            renderPointsMarkers();
+            saveUserPointsToStorage();
+            renderUserPoints();
             alert('Pomyślnie zaimportowano ' + imported.length + ' punktów!');
           }
         } catch(err) {
@@ -1281,46 +1301,123 @@
         }
       };
       reader.readAsText(file);
-    });
+    }
 
-    document.getElementById('btn-reset-points').addEventListener('click', () => {
-      if (confirm('Przywrócić fabryczną listę punktów (dom rodzinny, stacje, rekomendacje)?')) {
-        userPoints = [...DEFAULT_POINTS];
-        savePoints();
-        renderPointsMarkers();
+    // 11. NAWIGACJA SZYBKA
+    function focusHome() {
+      map.flyTo(homeEmilCoords, 16, { duration: 1.5 });
+      homeMarker.openPopup();
+    }
+    function focusDziadkowie() {
+      map.flyTo(dziadkowieCoords, 17, { duration: 1.5 });
+      dziadkowieMarker.openPopup();
+    }
+    function focusMama() {
+      map.flyTo(mamaCoords, 16, { duration: 1.5 });
+      mamaMarker.openPopup();
+    }
+    function focusChomranice() {
+      map.flyTo([49.6750, 20.6150], 13, { duration: 1.5 });
+      chomraniceMarker.openPopup();
+    }
+    function focusMarcinkowice() {
+      map.flyTo(marcinkowiceCoords, 14, { duration: 1.5 });
+      marcinkowiceMarker.openPopup();
+    }
+    function focusMalopolska() {
+      map.flyTo([49.8500, 20.3000], 10, { duration: 1.8 });
+    }
+
+    // 12. OBSŁUGA GPS W TERENIE
+    let gpsMarker = null;
+    let gpsCircle = null;
+    document.getElementById('btn-gps').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Geolokalizacja nie jest wspierana przez Twoją przeglądarkę.');
+        return;
       }
+      const btn = document.getElementById('btn-gps');
+      btn.innerText = '⏳ Namierzam...';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          btn.innerText = '🎯 GPS';
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const accuracy = pos.coords.accuracy;
+
+          if (gpsMarker) map.removeLayer(gpsMarker);
+          if (gpsCircle) map.removeLayer(gpsCircle);
+
+          gpsMarker = L.circleMarker([lat, lng], {
+            radius: 8,
+            color: '#38bdf8',
+            fillColor: '#0284c7',
+            fillOpacity: 0.9,
+            weight: 3
+          }).addTo(map).bindPopup(`<b>📍 Twoja Bieżąca Pozycja GPS</b><br>Dokładność: &plusmn;${Math.round(accuracy)} m`).openPopup();
+
+          gpsCircle = L.circle([lat, lng], {
+            radius: accuracy,
+            color: '#38bdf8',
+            fillColor: '#38bdf8',
+            fillOpacity: 0.12,
+            weight: 1
+          }).addTo(map);
+
+          map.flyTo([lat, lng], 15, { duration: 1.2 });
+        },
+        (err) => {
+          btn.innerText = '🎯 GPS';
+          alert('Błąd pobierania pozycji GPS: ' + err.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
     });
 
-    // --- PWA SERVICE WORKER REGISTRATION & INSTALL BANNER ---
+    // 13. PRZEŁĄCZNIK BOCZNEGO PANELU NA TELEFONIE (BEZ DOLNEGO DRAWERA!)
+    const sidebarEl = document.getElementById('sidebar');
+    const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+    const closeSidebarMobileBtn = document.getElementById('btn-close-sidebar-mobile');
+
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.addEventListener('click', () => {
+        sidebarEl.classList.toggle('mobile-open');
+      });
+    }
+    if (closeSidebarMobileBtn) {
+      closeSidebarMobileBtn.addEventListener('click', () => {
+        sidebarEl.classList.remove('mobile-open');
+      });
+    }
+
+    
+    // Rejestracja Service Workera PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-          .catch(err => console.warn('[PWA] SW registration failed:', err));
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
 
     let deferredPrompt;
-    const installBtn = document.getElementById('install-btn');
+    const installBtn = document.getElementById('btn-install-pwa');
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.classList.remove('hidden');
-      installBtn.classList.add('flex');
+      if (installBtn) installBtn.classList.remove('hidden');
     });
 
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log('[PWA] User choice:', outcome);
-      deferredPrompt = null;
-      installBtn.classList.add('hidden');
-    });
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+        installBtn.classList.add('hidden');
+      });
+    }
 
-    // Initial Marker Render
-    renderPointsMarkers();
-    lucide.createIcons();
+
+    // Załaduj punkty użytkownika przy starcie
+    loadUserPoints();
   </script>
 </body>
 </html>
